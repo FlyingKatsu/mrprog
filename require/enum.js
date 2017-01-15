@@ -143,99 +143,99 @@ var ENUM = {
         id: "default",
         desc: "Default dialogue lines for anyone",
         value: 1,
-        modifiers: new Modifiers( {
-          greeting: { mod: null, dialogue: new Dialogue( { 
+        modifiers: {
+          greeting: { mod: null, dialogue: { 
             happy: "Hello, @user!", 
             content: "", 
             okay: "", 
             withdrawn: "", 
             upset: "" 
-          } ) },
-          feeling: { mod: null, dialogue: new Dialogue( { 
+          }  },
+          feeling: { mod: null, dialogue: { 
             happy: "I'm doing great! How are you, @user?", 
             content: "", 
             okay: "", 
             withdrawn: "", 
             upset: "" 
-          } ) },
-          netalert: { mod: null, dialogue: new Dialogue( { 
+          } },
+          netalert: { mod: null, dialogue: { 
             happy: "Let's do this, @owner!", 
             content: "", 
             okay: "", 
             withdrawn: "", 
             upset: "" 
-          } ) },
-          herosuccess: { mod: null, dialogue: new Dialogue( { 
+          } },
+          herosuccess: { mod: null, dialogue: { 
             happy: "", 
             content: "", 
             okay: "", 
             withdrawn: "", 
             upset: "" 
-          } ) },
-          herofailure: { mod: null, dialogue: new Dialogue( { 
+          } },
+          herofailure: { mod: null, dialogue: { 
             happy: "", 
             content: "", 
             okay: "", 
             withdrawn: "", 
             upset: "" 
-          } ) },
-          accepts: { mod: null, dialogue: new Dialogue( { 
+          } },
+          accepts: { mod: null, dialogue: { 
             happy: "", 
             content: "", 
             okay: "", 
             withdrawn: "", 
             upset: "" 
-          } ) },
-          declines: { mod: null, dialogue: new Dialogue( { 
+          } },
+          declines: { mod: null, dialogue: { 
             happy: "", 
             content: "", 
             okay: "", 
             withdrawn: "", 
             upset: "" 
-          } ) },
-          wins: { mod: null, dialogue: new Dialogue( { 
+          } },
+          wins: { mod: null, dialogue: { 
             happy: "Great teamwork, @owner!", 
             content: "", 
             okay: "", 
             withdrawn: "", 
             upset: "" 
-          } ) },
-          loses: { mod: null, dialogue: new Dialogue( { 
+          } },
+          loses: { mod: null, dialogue: { 
             happy: "", 
             content: "", 
             okay: "", 
             withdrawn: "", 
             upset: "" 
-          } ) },
-          battles: { mod: null, dialogue: new Dialogue( { 
+          } },
+          battles: { mod: null, dialogue: { 
             happy: "", 
             content: "", 
             okay: "", 
             withdrawn: "", 
             upset: "" 
-          } ) },
-          cheats: { mod: null, dialogue: new Dialogue( { 
+          } },
+          cheats: { mod: null, dialogue: { 
             happy: "", 
             content: "", 
             okay: "", 
             withdrawn: "", 
             upset: "" 
-          } ) },
-          bails: { mod: null, dialogue: new Dialogue( { 
+          } },
+          bails: { mod: null, dialogue: { 
             happy: "Let's try again next time!", 
             content: "", 
             okay: "", 
             withdrawn: "", 
             upset: "" 
-          } ) },
-          confused: { mod: null, dialogue: new Dialogue( { 
+          } },
+          confused: { mod: null, dialogue: { 
             happy: "@User, I don't understand...", 
             content: "", 
             okay: "", 
             withdrawn: "", 
             upset: "" 
-          } )  }
-        } )
+          } }
+        }
       }
     },
     getDetails: function() {

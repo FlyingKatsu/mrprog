@@ -32,12 +32,12 @@ var NPC = {
   
   announcer: {
     name: "NetOfficial",
-    color = {
+    color: {
       normal: "#609088",
       warning: "#E07828",
       error: "#E89018"
     },
-    img = {
+    img: {
       normal: "http://flyingkatsu.com/dsc/BattleNetworkFK/avatars/Official/NetOfficial.png",
       warning: "http://flyingkatsu.com/dsc/BattleNetworkFK/avatars/Official/NetOfficial.png",
       error: "http://flyingkatsu.com/dsc/BattleNetworkFK/avatars/Official/NetPolice.png"

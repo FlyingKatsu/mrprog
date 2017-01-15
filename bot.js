@@ -77,10 +77,12 @@ if (Object.freeze) Object.freeze(FORMAT);
 var UTIL = {
   setServer: function( channels ) {
     
+    let tempMain = channels.main;
+    
     // Set MAIN to DEBUG if MAIN is NULL
     if ( !channels.main ) {
       if ( channels.debug ) {
-        channels.main = channels.debug;
+        tempMain = channels.debug;
         console.log("UTIL:: Channel DEBUG will be used because MAIN is null");
       } else {
         console.log("UTIL:: You must specify a DEBUG or MAIN channel ID!");
@@ -89,22 +91,23 @@ var UTIL = {
     }
     
     // Get the guild object for the server
-    SERVER.guild = client.guilds.get( CONFIG.guildID );
+    SERVER.guild = CLIENT.guilds.get( CONFIG.guildID );
     
     if ( SERVER.guild ) {      
       // Connect SERVER to actual channel objects
       // redirecting any null channel IDs to MAIN
-      SERVER.channels.main = SERVER.guild.channels.get( CONFIG.channels.main );
-      SERVER.channels.info = SERVER.guild.channels.get( CONFIG.channels.info || CONFIG.channels.main );
-      SERVER.channels.battle = SERVER.guild.channels.get( CONFIG.channels.battle || CONFIG.channels.main );
-      SERVER.channels.shop = SERVER.guild.channels.get( CONFIG.channels.shop || CONFIG.channels.main );
-      SERVER.channels.oc = SERVER.guild.channels.get( CONFIG.channels.oc || CONFIG.channels.main );
-      SERVER.channels.debug = SERVER.guild.channels.get( CONFIG.channels.debug || CONFIG.channels.main );
+      SERVER.channels.main = SERVER.guild.channels.get( tempMain );
+      SERVER.channels.info = SERVER.guild.channels.get( channels.info || tempMain );
+      SERVER.channels.battle = SERVER.guild.channels.get( channels.battle || tempMain );
+      SERVER.channels.shop = SERVER.guild.channels.get( channels.shop || tempMain );
+      SERVER.channels.oc = SERVER.guild.channels.get( channels.oc || tempMain );
+      SERVER.channels.debug = SERVER.guild.channels.get( channels.debug || tempMain );
       
       // Set up roles
       UTIL.setRoles();
     } else {
       // If the guild wasn't found, the SERVER isn't valid
+      console.log("Couldn't find the SERVER!");
       SERVER.isValid = false;
     }
     
@@ -215,7 +218,7 @@ var COMMAND = {
         msg.channel
           .sendEmbed( FORMAT.embed( NPC.getEmbed( 
             'error', 'error',
-            `ERROR!! ERROR!! ERROR!!\n\nUNRECOGNIZED BASE KEYWORD IN COMMAND:\n\n ${FORMAT.inline("VARIANTS " + args[0].toUpperCase())}\n\nPlease pick a valid base keyword and try this command again`) )
+            `ERROR!! ERROR!! ERROR!!\n\nUNRECOGNIZED BASE KEYWORD IN COMMAND:\n\n ${FORMAT.inline("VARIANTS " + args[0].toUpperCase())}\n\nPlease pick a valid base keyword and try this command again`) ) )
           .catch(console.log);
         COMMAND.bases(msg, args);
       } else {
@@ -266,7 +269,7 @@ var COMMAND = {
         allPartners.get(msg.author.id).getEmbed( msg, 'greeting') ) )
         .catch(console.log);
       SERVER.guild.member(msg.author)
-        .addRole( SERVER.roles.partnered) )
+        .addRole( SERVER.roles.partnered )
         .catch(console.log);
     //}
   },
@@ -541,11 +544,11 @@ CLIENT.on( 'ready', () => {
   
   if ( SERVER.isValid ) {
     SERVER.channels.main.sendMessage(
-      `${SERVER.guild.roles.find("name", CONFIG.roles.partnered)} ${CONFIG.botname} is now online!`
+      `${SERVER.roles.partnered} ${CONFIG.botname} is now online!`
     ).catch(console.log);
   } else {
     console.log("INVALID SERVER OR CHANNEL IDs. SHUTTING DOWN!");
-    client.destroy().catch(console.log);
+    CLIENT.destroy().catch(console.log);
   }
   
 } );
@@ -557,7 +560,7 @@ CLIENT.on( 'message', msg => {
   if (msg.author.bot) return;
   
   // React to mention at me in MAIN or DM only
-  if ( msg.mentions.users.exists('username', SECRET.botusername) 
+  if ( msg.mentions.users.exists('username', SECRET.botuser) 
       && (msg.type === "dm" || msg.channel === SERVER.channels.main) ) {
     if ( allPartners.has( msg.author.id ) ) {
       let partner = allPartners.get(msg.author.id);
@@ -575,7 +578,7 @@ CLIENT.on( 'message', msg => {
       // Remind user to create a partner for themselves
       msg.channel
         .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 'normal', 'normal', 
-          `Hello, ${msg.author}!\n\nType the following to make your own ${CONFIG.partnerLabel}:\n\n${FORMAT.code("create NAME BASE VARIANT", ${CONFIG.prefix})}`, 
+          `Hello, ${msg.author}!\n\nType the following to make your own ${CONFIG.partnerLabel}:\n\n${FORMAT.code("create NAME BASE VARIANT", CONFIG.prefix)}`, 
           null ) ) )
         .catch(console.log);
     }
