@@ -1,8 +1,8 @@
-//const SECRET = require("./require/conf.json");
-//const CONFIG = require("./require/config.js");
-//const NPC = require("./require/npc.js");
-//const CUSTOM = require("./require/custom.js");
-//const ENUM = require("./require/enum.js");
+const SECRET = require("./require/conf.json");
+const CONFIG = require("./require/config.js");
+const NPC = require("./require/npc.js");
+const CUSTOM = require("./require/custom.js");
+const ENUM = require("./require/enum.js");
 
 const DISCORD = require('discord.js');
 const CLIENT = new DISCORD.Client();

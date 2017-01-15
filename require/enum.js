@@ -913,4 +913,4 @@ var ENUM = {
 };
 
 if (Object.freeze) Object.freeze(ENUM);
-//module.exports = ENUM;
+module.exports = ENUM;

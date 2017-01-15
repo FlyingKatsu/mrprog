@@ -38,4 +38,4 @@ var CUSTOM = {
 };
 
 if (Object.freeze) Object.freeze(CUSTOM);
-//module.exports = CUSTOM;
+module.exports = CUSTOM;

@@ -48,4 +48,4 @@ var NPC = {
 };
 
 if (Object.freeze) Object.freeze(NPC);
-//module.exports = NPC;
+module.exports = NPC;
