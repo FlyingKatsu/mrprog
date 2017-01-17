@@ -62,17 +62,15 @@ var FORMAT = {
   },
   
   embed: function( input ) {
-    /*let em = input || {};
-    let output = new Discord.RichEmbed( input );
-    if ( em.author ) output.setAuthor( em.author );
-    if ( em.title ) output.setTitle( em.title );
-    if ( em.desc ) output.setDescription( em.desc );
-    if ( em.thumb ) output.setThumbnail( em.thumb );
-    if ( em.imgurl ) output.setImage( em.imgurl );
-    if ( em.color ) output.setColor( em.color );
-    if ( em.foot ) output.setFooter( em.foot );
-    return output;*/
-    return new DISCORD.RichEmbed( input );
+    let output = new DISCORD.RichEmbed();
+    if( input.author ) output.setAuthor( input.author );
+    if( input.title ) output.setTitle( input.title );
+    if( input.desc ) output.setDescription( input.desc );
+    if( input.thumb ) output.setThumbnail( input.thumb );
+    if( input.imgurl ) output.setImage( input.imgurl );
+    if( input.color ) output.setColor( input.color );
+    if( input.foot ) output.setFooter( input.foot );
+    return output;
   }
 };
 if (Object.freeze) Object.freeze(FORMAT);
@@ -702,11 +700,11 @@ CLIENT.on( 'message', msg => {
   // Get the command name
   let cmd = args[0].toLowerCase().slice(CONFIG.prefix.length);
   args = args.slice(1);
-
+  
+  let name = (msg.channel.type === "text") ? msg.member.displayName : msg.author.username;
+  
   // Check permissions for the command
   if (ENUM.Command.hasOwnProperty(cmd)) {
-    //let isPermitted = true;
-    let name = (msg.channel.type === "text") ? msg.member.displayName : msg.author.username;
     
     //if ( COMMAND.isPermitted(cmd, msg) ) {
     if ( true ) {

@@ -1,42 +1,51 @@
-var NPC_Base = function() {
-  this.name= "NPC";
-  this.color= {
+// ===============================================
+// Factory NPC properties (to copy or overwrite)
+// ===============================================
+var FactoryNPC = function( input ) {
+  this.name = input.name || "NPC";
+  this.color = input.color || {
     normal: "#70C040",
     warning: "#DF6777",
     error: "#FAA61A"
   };
-  this.img= {
+  this.img = input.img || {
     normal: "https://cdn.pbrd.co/images/hXrbGDHil.png",
     warning: "https://cdn.pbrd.co/images/hXrbGDHil.png",
     error: "https://cdn.pbrd.co/images/hXrbGDHil.png"
   };
-  this.getEmbed= function( imgID, colorID, desc, foot, title, image ) {
-    return {
-      author: this.name,
-      description: text,
-      thumbnail: this.img[imgID],
-      color: this.color[colorID],
-      footer: foot,
-      title: title,
-      image: image
-    };
-  };
-}();
-
-var NPC_Construct = function( obj ) {
-  if (obj.name) this.name = obj.name;
-  if (obj.color) this.color = obj.color;
-  if (obj.img) this.img = obj.img;
-  this.prototype = NPC_Base;
 };
 
+
+// ===============================================
+// Factory NPC methods (for prototypal inheritance)
+// ===============================================
+FactoryNPC.prototype.getEmbed = function( imgID, colorID, text, foot, title, image ) {
+  return {
+    author: this.name,
+    desc: text,
+    thumb: this.img[imgID],
+    color: this.color[colorID],
+    foot: foot,
+    title: title,
+    imgurl: image
+  };
+};
+
+
+// ===============================================
+// Factory NPC Instantiation (new instances)
+// ===============================================
+
+// Object to export to Node.JS app
 var NPC = {
   
-  guide: new NPC_Construct ( {
+  // Main responder for the bot
+  guide: new FactoryNPC ( {
     name: "MR.PROG"
   } ),
   
-  announcer: new NPC_Construct ( {
+  // Battle responder for the bot
+  announcer: new FactoryNPC ( {
     name: "NetOfficial",
     color: {
       normal: "#609088",
@@ -47,6 +56,21 @@ var NPC = {
       normal: "http://flyingkatsu.com/dsc/BattleNetworkFK/avatars/Official/NetOfficial.png",
       warning: "http://flyingkatsu.com/dsc/BattleNetworkFK/avatars/Official/NetOfficial.png",
       error: "http://flyingkatsu.com/dsc/BattleNetworkFK/avatars/Official/NetPolice.png"
+    }
+  } ),
+  
+  // Shop responder for the bot
+  dealer: new FactoryNPC ( {
+    name: "NetDealer",
+    color: {
+      normal: "#7840A8",
+      warning: "#DF6777",
+      error: "#FAA61A"
+    },
+    img: {
+      normal: "http://flyingkatsu.com/dsc/BattleNetworkFK/avatars/Generic/Egg.png",
+      warning: "http://flyingkatsu.com/dsc/BattleNetworkFK/avatars/Generic/Egg.png",
+      error: "http://flyingkatsu.com/dsc/BattleNetworkFK/avatars/Generic/Egg.png"
     }
   } )
   
