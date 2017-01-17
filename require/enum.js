@@ -263,6 +263,8 @@ var ENUM = {
     hey: 13,
     clear: 14,
     challenge: 15,
+    save: 16,
+    load: 17,
     properties: {
         1: {
             id: "shutdown",
@@ -398,7 +400,25 @@ var ENUM = {
             perm: ["any"],
             enableDM: true,
             channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
-        }
+        },
+        16: {
+              id: "save",
+              usage: "save",
+              value: 16,
+              desc: "Download a copy of internal files",
+              perm: ["partnered"],
+              enableDM: true,
+              channels: [ "main", "info", "oc", "debug" ]
+          },
+        17: {
+              id: "load",
+              usage: "load",
+              value: 17,
+              desc: "Upload new internal files",
+              perm: ["partnered"],
+              enableDM: true,
+              channels: [ "main", "info", "oc", "debug" ]
+          }
     }
   },
 

@@ -6,6 +6,7 @@ const ENUM = require("./require/enum.js");
 
 const JSONFILE = require('jsonfile');
 const REQUEST = require('request');
+//const URL = require('url');
 const DISCORD = require('discord.js');
 const CLIENT = new DISCORD.Client();
 
@@ -33,7 +34,7 @@ const SERVER = {
 //  STATE VARIABLES
 // =========================================================
 var allPartners = new Map();
-
+var disconnected = false;
 
 // =========================================================
 //  UTILITY FUNCTIONS
@@ -154,6 +155,61 @@ var UTIL = {
       console.log(user);
       return SERVER.guild.member(user).roles.has(SERVER.roles[item].id);
     }
+  },
+  
+  isFilePermitted: function( ) {
+    /*let type = header.content-type.split(" ")[0]
+    if ( type !== "text/plain" && type !== "application/json") return false;
+    if ( header.transfer-encoding === "chunked" ) {
+      console.log("TODO: Count bytes as they arrive");
+    } else {
+      return header.content-length <= 1000000; //1MB
+    }*/
+    return true;
+  },
+  
+  sendFileRequest: function( uri, callbackA, callbackB ) {
+    
+    REQUEST( uri , function(error, response, body) {      
+      if( !error && response.statusCode === 200 ) {
+        callbackA( JSON.parse(body) );
+      } else {
+        console.log("There was an error loading your file...\n" + error);
+        callbackA( {} );
+      }
+      console.log("========");
+    })
+      .on( 'response', function(response) {
+        let self = this;
+        let invalidCode = "";
+        
+        let ctype = response.headers["content-type"].split(" ")[0];
+        if( !ctype.includes("text/plain") && !ctype.includes("application/json") ) {
+          console.log("Type: " + ctype);
+          console.log("Wrong File Type!  Aborting...");
+          invalidCode = "filetype";
+          self.abort();
+        }
+      
+        let byteCounter = 0;
+        response.on( 'data', function( data ) { 
+          console.log(`B:: ${byteCounter}`);    
+          
+          if( byteCounter + data.length > SECRET.maxfilesize * 1000 ) {
+            console.log("File too large!  Aborting...");
+            invalidCode = "filesize";
+            self.abort();
+            
+          } else {
+            byteCounter += data.length; 
+            console.log(`B:: decoded ${data.length} total: ${byteCounter}`);
+          }
+        } );
+        response.on( 'end', function() {
+          console.log("Finished loading file request");
+          callbackB( { code: this.statusCode, reason: invalidCode } );
+        } );
+      } );
   }
 };
 if (Object.freeze) Object.freeze(UTIL);
@@ -368,6 +424,45 @@ var COMMAND = {
         'normal', 'normal', ENUM.Challenge.getDetails(), "" ) ) )
       .catch(console.log);
   },
+  save: function(msg, args) {
+    // TODO: Process arguments
+    JSONFILE.writeFile("temp/test_" + msg.author.id + ".txt", NPC.guide, {spaces: 2}, function(error){ 
+      console.log("Writing...");
+      console.log("ERROR: " + error);
+      console.log("Done writing!");
+      msg.author.send("Here is your file!", { file: "temp/test_" + msg.author.id + ".txt" })
+        .then( console.log("finished sending the attachment, so delete file and enable user to do read/writes again") )
+        .catch(console.log);
+    });
+  },
+  load: function(msg, args) {
+    // TODO: Process first argument
+    
+    // Get Attachment data
+    if (msg.attachments.size > 0) {
+      console.log("Checking for Attached File");
+      let atfile = msg.attachments.first();      
+      // TODO: Handle Result
+      UTIL.sendFileRequest( atfile.url, 
+        function(json) { console.log("JSON: " + json); },
+        function(status) { console.log("Status Code: " + status.code); console.log("Reason: " + status.reason); }
+        );
+      
+    // Get URL data
+    } else if ( args[1] ) {
+      console.log("Checking for URL");
+      // TODO: Handle Result
+      UTIL.sendFileRequest( args[1], 
+        function(json) { console.log("JSON: " + json); },
+        function(status) { console.log("Status Code: " + status.code); console.log("Reason: " + status.reason); }
+        );
+
+    } else {
+      console.log("No file detected!");
+      console.log(args);
+      return;
+    }
+  },
   // Helper functions that used to be part of ENUM.Command
   getDetails: function() {
     let str = ``;
@@ -523,6 +618,15 @@ CLIENT.on('guildMemberAvailable', () => {
 });
 CLIENT.on('disconnect', closeEvent => {
   console.log('Mr.Prog went offline with code ' + closeEvent.code);
+  disconnected = true;
+  console.log(JSON.stringify(closeEvent.target._events.open));
+  console.log("=====");
+  console.log(JSON.stringify(closeEvent.target._events.message));
+  console.log("=====");
+  console.log(JSON.stringify(closeEvent.target._events.close));
+  console.log("=====");
+  console.log(JSON.stringify(closeEvent.target._events.error));
+  console.log("=====");
 });
 CLIENT.on('reconnecting', () => {
   console.log('Mr.Prog is attempting to reconnect');
@@ -537,23 +641,25 @@ CLIENT.on('error', error => {
 // Initialization Procedure
 CLIENT.on( 'ready', () => {
   
-  console.log('Mr.Prog the Discord bot is now online');
-  
-  if ( CONFIG.isDebugMode ) {
-    UTIL.setServer( CONFIG.channels.debugmode );
+  if (disconnected) {
+    console.log("RECOVERED from D/C");
   } else {
-    UTIL.setServer( CONFIG.channels.normalmode );
+    console.log('Mr.Prog the Discord bot is now online');
+    if ( CONFIG.isDebugMode ) {
+      UTIL.setServer( CONFIG.channels.debugmode );
+    } else {
+      UTIL.setServer( CONFIG.channels.normalmode );
+    }
+
+    if ( SERVER.isValid ) {
+      SERVER.channels.main.sendMessage(
+        `${SERVER.roles.partnered} ${CONFIG.botname} is now online!`
+      ).catch(console.log);
+    } else {
+      console.log("INVALID SERVER OR CHANNEL IDs. SHUTTING DOWN!");
+      CLIENT.destroy().catch(console.log);
+    } 
   }
-  
-  if ( SERVER.isValid ) {
-    SERVER.channels.main.sendMessage(
-      `${SERVER.roles.partnered} ${CONFIG.botname} is now online!`
-    ).catch(console.log);
-  } else {
-    console.log("INVALID SERVER OR CHANNEL IDs. SHUTTING DOWN!");
-    CLIENT.destroy().catch(console.log);
-  }
-  
 } );
 
 // Message Handling
@@ -587,38 +693,6 @@ CLIENT.on( 'message', msg => {
     }
   }
   
-  // Get Attachment data
-  if (msg.attachments.size > 0) {
-    let atfile = msg.attachments.first();
-    //console.log(msg.attachments);
-    //console.log(atfile);
-    console.log(atfile.filename);
-    console.log(atfile.url);
-    console.log(atfile.proxyURL);
-    console.log("++++++++++");
-    
-    REQUEST(atfile.url, function(error, response, body){
-      console.log("error: \n" + error);
-      console.log("response: \n" + response);
-      if( !error && response.statusCode === 200 ) {
-        console.log("body: \n" + body);
-        let newfile = JSON.parse(body);
-        console.log(newfile.test);
-      }      
-      console.log("========");
-    });
-    
-    JSONFILE.writeFile(msg.author.id + ".txt", NPC.guide, function(error){ 
-      console.log("Writing...");
-      console.log(error);
-      console.log("Done writing!");
-      msg.author.send("Here is your file!", { file: msg.author.id + ".txt" })
-        .then( console.log("finished sending the attachment, so delete file and enable user to do read/writes again") )
-        .catch(console.log);
-    });
-    return;
-  }
-
   // Ignore not commands
   if (!msg.content.startsWith(CONFIG.prefix)) return;
 
@@ -634,13 +708,14 @@ CLIENT.on( 'message', msg => {
     //let isPermitted = true;
     let name = (msg.channel.type === "text") ? msg.member.displayName : msg.author.username;
     
-    if ( COMMAND.isPermitted(cmd, msg) ) {
+    //if ( COMMAND.isPermitted(cmd, msg) ) {
+    if ( true ) {
       // process command
-      COMMAND[ENUM.Command[cmd]](msg, args);
+      COMMAND[cmd](msg, args);
     } else {
       // alert that this user is not permitted
       msg.author
-        .sendEmbed( FORMAT.embed( NPC.guide.prototype.getEmbed( 'error', 'error', 
+        .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 'error', 'error', 
         `ERROR!! ERROR!! ERROR!!\n\n${FORMAT.code(`User: ${name}\nChannel: ${msg.channel.name}\nCommand: ${CONFIG.prefix}${args.join(" ")}`)}\n\nACCESS DENIED!!`,
         null ) ) )
         .catch(console.log);
