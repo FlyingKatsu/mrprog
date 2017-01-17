@@ -4,6 +4,8 @@ const NPC = require("./require/npc.js");
 const CUSTOM = require("./require/custom.js");
 const ENUM = require("./require/enum.js");
 
+const JSONFILE = require('jsonfile');
+const REQUEST = require('request');
 const DISCORD = require('discord.js');
 const CLIENT = new DISCORD.Client();
 
@@ -128,7 +130,7 @@ var UTIL = {
   boolMapReduce: function(input, arr, fnIN, fnOUT) {
     var result = input;
     for (var i=0; i<arr.length; i++) {
-      result = fnOut( result, fnIN(arr[i]) );
+      result = fnOUT( result, fnIN(arr[i]) );
     }
     return result;
   },
@@ -149,6 +151,7 @@ var UTIL = {
   
   roleMatch: function( user ) {
     return function( user, item ) {
+      console.log(user);
       return SERVER.guild.member(user).roles.has(SERVER.roles[item].id);
     }
   }
@@ -374,13 +377,13 @@ var COMMAND = {
     return str;
   },
   isUserPermitted: function( cmd, msg ) {
-    return UTIL.boolMapReduce( false, ENUM.Command.properties[ENUM.Command[cmd]].perm, UTIL.roleMatch(msg.author), reduceOR );
+    return UTIL.boolMapReduce( false, ENUM.Command.properties[ENUM.Command[cmd]].perm, UTIL.roleMatch(msg.author), UTIL.reduceOR );
   },
   isPermitted: function( cmd, msg ) {
     if ( msg.channel.type === "dm" ) {
       return ENUM.Command.properties[ENUM.Command[cmd]].enableDM && this.isUserPermitted( cmd, msg );
     } else {
-      return UTIL.boolMapReduce( false, ENUM.Command.properties[ENUM.Command[cmd]].channels, UTIL.channelMatch(msg.channel), reduceOR ) && this.isUserPermitted( cmd, msg );
+      return UTIL.boolMapReduce( false, ENUM.Command.properties[ENUM.Command[cmd]].channels, UTIL.channelMatch(msg.channel), UTIL.reduceOR ) && this.isUserPermitted( cmd, msg );
     }
   }
 };
@@ -583,6 +586,38 @@ CLIENT.on( 'message', msg => {
         .catch(console.log);
     }
   }
+  
+  // Get Attachment data
+  if (msg.attachments.size > 0) {
+    let atfile = msg.attachments.first();
+    //console.log(msg.attachments);
+    //console.log(atfile);
+    console.log(atfile.filename);
+    console.log(atfile.url);
+    console.log(atfile.proxyURL);
+    console.log("++++++++++");
+    
+    REQUEST(atfile.url, function(error, response, body){
+      console.log("error: \n" + error);
+      console.log("response: \n" + response);
+      if( !error && response.statusCode === 200 ) {
+        console.log("body: \n" + body);
+        let newfile = JSON.parse(body);
+        console.log(newfile.test);
+      }      
+      console.log("========");
+    });
+    
+    JSONFILE.writeFile(msg.author.id + ".txt", NPC.guide, function(error){ 
+      console.log("Writing...");
+      console.log(error);
+      console.log("Done writing!");
+      msg.author.send("Here is your file!", { file: msg.author.id + ".txt" })
+        .then( console.log("finished sending the attachment, so delete file and enable user to do read/writes again") )
+        .catch(console.log);
+    });
+    return;
+  }
 
   // Ignore not commands
   if (!msg.content.startsWith(CONFIG.prefix)) return;
@@ -605,7 +640,7 @@ CLIENT.on( 'message', msg => {
     } else {
       // alert that this user is not permitted
       msg.author
-        .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 'error', 'error', 
+        .sendEmbed( FORMAT.embed( NPC.guide.prototype.getEmbed( 'error', 'error', 
         `ERROR!! ERROR!! ERROR!!\n\n${FORMAT.code(`User: ${name}\nChannel: ${msg.channel.name}\nCommand: ${CONFIG.prefix}${args.join(" ")}`)}\n\nACCESS DENIED!!`,
         null ) ) )
         .catch(console.log);
