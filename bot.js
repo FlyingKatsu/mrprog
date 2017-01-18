@@ -483,16 +483,16 @@ var COMMAND = {
 if (Object.freeze) Object.freeze(COMMAND);
 
 var CHARACTER = {
-  proto: {
-    basic: function() {
-  this.owner = CLIENT.user;
-  this.baseKey = 1;
-  this.variantKey = 0;
-  this.level = 0;
-  this.xp = 0;
-  this.mood = 1;
-  this.numResets = 0;
-  this.custom = new Customization();
+   = function(  ) {
+      this.owner = CLIENT.user;
+      this.baseKey = 1;
+      this.variantKey = 0;
+      this.level = 0;
+      this.xp = 0;
+      this.mood = 1;
+      this.numResets = 0;
+      this.custom = new Customization();
+    }
 
   this.getEmbed = function(msg, situation) {
     return {
