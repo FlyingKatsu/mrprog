@@ -617,6 +617,9 @@ CLIENT.on('guildMemberAvailable', () => {
 CLIENT.on('disconnect', closeEvent => {
   console.log('Mr.Prog went offline with code ' + closeEvent.code);
   disconnected = true;
+  CLIENT.user.setAFK(true);
+  CLIENT.user.setStatus('dnd');
+  CLIENT.user.setGame("Unexpected Disconnect!");
   console.log(JSON.stringify(closeEvent.target._events.open));
   console.log("=====");
   console.log(JSON.stringify(closeEvent.target._events.message));
@@ -641,8 +644,13 @@ CLIENT.on( 'ready', () => {
   
   if (disconnected) {
     console.log("RECOVERED from D/C");
+    CLIENT.user.setAFK(false);
+    CLIENT.user.setStatus('online');
+    CLIENT.user.setGame(CONFIG.game);
   } else {
     console.log('Mr.Prog the Discord bot is now online');
+    CLIENT.user.setGame(CONFIG.game);
+    CLIENT.user.setStatus('dnd');
     if ( CONFIG.isDebugMode ) {
       UTIL.setServer( CONFIG.channels.debugmode );
     } else {
@@ -653,6 +661,7 @@ CLIENT.on( 'ready', () => {
       SERVER.channels.main.sendMessage(
         `${SERVER.roles.partnered} ${CONFIG.botname} is now online!`
       ).catch(console.log);
+      CLIENT.user.setStatus('online');
     } else {
       console.log("INVALID SERVER OR CHANNEL IDs. SHUTTING DOWN!");
       CLIENT.destroy().catch(console.log);
