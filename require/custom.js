@@ -25,6 +25,7 @@ var CUSTOM = {
     this.cheats = input.cheats || { mod: null, dialogue: new Dialogue() };
     this.bails = input.bails || { mod: null, dialogue: new Dialogue() };
     this.confused = input.confused || { mod: null, dialogue: new Dialogue() };
+    this.customized = input.customized || { mod: null, dialogue: new Dialogue() };
   },
 
   Dialogue: function( input ) {

@@ -72,6 +72,19 @@ var FORMAT = {
     return output;
   },
   
+  isHexCode: function ( str ) {
+    let code, i, len;    
+    for (i = 0, len = str.length; i < len; i++) {
+      code = str.charCodeAt(i);
+      // NOTE: decimals are shifted by one due to comparison as > < instead of >= <=
+      if (!(code > 47 && code < 58) && // numeric (0-9)
+          !(code > 64 && code < 71) && // upper alpha (A-F)
+          !(code > 96 && code < 103) && // lower alpha (a-f)
+      { return false; }
+    }
+    return true;
+  },
+  
   isAlphaNumericJP: function( str ) {
     // Adapted from Michael Martin-Smucker on StackOverflow
     // http://stackoverflow.com/questions/4434076/best-way-to-alphanumeric-check-in-javascript/25352300#25352300
@@ -253,7 +266,14 @@ var COMMAND = {
       msg.reply( ` CLEAR command accepts only values greater than 2 and less than 200!` )
         .catch(console.log);
     } else {
-      msg.channel.bulkDelete(numDel)
+      
+      let channel = msg.channel;
+      
+      if ( SERVER.channels[ args[1].toLowerCase() ] ) {
+         channel = SERVER.channels[ args[1].toLowerCase() ];
+      }
+      
+      channel.bulkDelete(numDel)
         .then(
           msg.channel
             .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
@@ -262,6 +282,7 @@ var COMMAND = {
               `by @${msg.author.username}#${msg.author.discriminator} in #${msg.channel.name}` ) ) )
             .catch(console.log)
       ).catch(console.log);
+      
     }
   },
   
@@ -330,8 +351,48 @@ var COMMAND = {
         .catch(console.log);
     }
   },  
-  rename: function(msg, args, useOC) {},
-  recolor: function(msg, args, useOC) {},
+  rename: function(msg, args, useOC) {
+    let name = args[0].strip("*").strip(CONFIG.suffix) || null;
+      
+    if ( FORMAT.isAlphaNumericJP( args[0].strip(CONFIG.suffix) ) ) {
+      msg.reply(`${FORMAT.inline(name)} is not a valid [name]\n[name] should be alphanumeric, kana, and/or kanji.\nAny required suffix will be added automatically.`)
+        .catch(console.log);
+      return;
+    }
+    
+    if ( CONFIG.enforceSuffix ) name += CONFIG.suffix;
+    
+    if ( allPartners.has( msg.author.id ) ) {
+      let partner = allPartners.get(msg.author.id);
+      partner.setName(name);
+      msg.channel.sendMessage( FORMAT.embed( 
+        allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'customized') ) )
+        .catch(console.log);
+    } else {
+      msg.reply(`BUT YOU DON'T HAVE A ${CONFIG.partnerLabel.toUpperCase()} YET!!`)
+        .catch(console.log);
+    }
+  },
+  recolor: function(msg, args, useOC) {
+    let color = args[0].strip("#").slice(0,6);
+        
+    if ( FORMAT.isHexCode( color ) ) {
+      msg.reply(`${FORMAT.inline(color)} is not a valid [hexcolor]!`)
+        .catch(console.log);
+      return;
+    }
+    
+    if ( allPartners.has( msg.author.id ) ) {
+      let partner = allPartners.get(msg.author.id);
+      partner.setColor("#"+color);
+      msg.channel.sendMessage( FORMAT.embed( 
+        allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'customized') ) )
+        .catch(console.log);
+    } else {
+      msg.reply(`BUT YOU DON'T HAVE A ${CONFIG.partnerLabel.toUpperCase()} YET!!`)
+        .catch(console.log);
+    }
+  },
   save: function(msg, args, useOC) {
     // TODO: Process arguments
     JSONFILE.writeFile("temp/test_" + msg.author.id + ".txt", NPC.guide, {spaces: 2}, function(error){ 

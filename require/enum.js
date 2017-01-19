@@ -229,11 +229,18 @@ var ENUM = {
             upset: "" 
           } },
           confused: { mod: null, dialogue: { 
-            happy: "@User, I don't understand...", 
-            content: "", 
-            okay: "", 
-            withdrawn: "", 
-            upset: "" 
+            happy: "Hahaha, @User did you mess up again?", 
+            content: "@User, I don't think that's what you meant to do", 
+            okay: "@User, I don't understand...", 
+            withdrawn: "...", 
+            upset: "How stupid." 
+          } },
+          customized: { mod: null, dialogue: { 
+            happy: "@User, thanks for the upgrade!", 
+            content: "@User, do you think this suits me better?", 
+            okay: "@User, I don't know if this suits me, but okay.", 
+            withdrawn: "Oh...", 
+            upset: "HMPH" 
           } }
         }
       }
@@ -292,10 +299,10 @@ var ENUM = {
       },
       3: {
         id: "clear",
-        usage: "clear [number] [channel]",
+        usage: "clear [number] (main|shop|battle|oc|debug)",
         cmd: "clear",
         value: 3,
-        desc: "Delete last [number] of messages in [channel]. If unspecified, defaults to deleting last 10 messages in current channel.\n2 < [number] < 200\n",
+        desc: "Delete last [number] of messages in the specified channel. If unspecified, defaults to deleting last 10 messages in current channel.\n2 < [number] < 200",
         perm: ["mod", "admin"],
         enableDM: true,
         channels: [ "main", "battle", "shop", "oc", "debug" ]
@@ -331,7 +338,7 @@ var ENUM = {
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
       },
-
+      
       6: {
         id: "create",
         usage: "create [name] [preset] [variant]",
