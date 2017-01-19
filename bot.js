@@ -13,7 +13,6 @@ const CLIENT = new DISCORD.Client();
 const SERVER = {
   guild: null,
   roles: {
-    any: null,
     partnered: null,
     mod: null,
     admin: null
@@ -122,7 +121,6 @@ var UTIL = {
   },
   
   setRoles: function() {
-    SERVER.roles.any = SERVER.guild.roles.find('name', CONFIG.roles.any);
     SERVER.roles.partnered = SERVER.guild.roles.find('name', CONFIG.roles.partnered);
     SERVER.roles.mod = SERVER.guild.roles.find('name', CONFIG.roles.mod);
     SERVER.roles.admin = SERVER.guild.roles.find('name', CONFIG.roles.admin);
@@ -145,14 +143,13 @@ var UTIL = {
   },
   
   channelMatch: function( channel ) {
-    return function( channel, item ) {
+    return function( item ) {
       return SERVER.channels[item] === channel;
     }
   },
   
   roleMatch: function( user ) {
-    return function( user, item ) {
-      console.log(user);
+    return function( item ) {
       return SERVER.guild.member(user).roles.has(SERVER.roles[item].id);
     }
   },
@@ -472,6 +469,7 @@ var COMMAND = {
     return str;
   },
   isUserPermitted: function( cmd, msg ) {
+    if ( ENUM.Command.properties[ENUM.Command[cmd]].perm.length == 0 ) return true;
     return UTIL.boolMapReduce( false, ENUM.Command.properties[ENUM.Command[cmd]].perm, UTIL.roleMatch(msg.author), UTIL.reduceOR );
   },
   isPermitted: function( cmd, msg ) {
@@ -529,12 +527,13 @@ CLIENT.on( 'ready', () => {
   } else {
     
     console.log('Mr.Prog the Discord bot is now online');
-    CLIENT.user.setGame(CONFIG.game);
     CLIENT.user.setStatus('dnd');
     
     if ( CONFIG.isDebugMode ) {
+      CLIENT.user.setGame("DEBUG MODE");
       UTIL.setServer( CONFIG.channels.debugmode );
     } else {
+      CLIENT.user.setGame(CONFIG.game);
       UTIL.setServer( CONFIG.channels.normalmode );
     }
 
@@ -598,8 +597,8 @@ CLIENT.on( 'message', msg => {
   // Check permissions for the command
   if (ENUM.Command.hasOwnProperty(cmd)) {
     
-    //if ( COMMAND.isPermitted(cmd, msg) ) {
-    if ( true ) {
+    if ( COMMAND.isPermitted(cmd, msg) ) {
+    //if ( true ) {
       // process command
       COMMAND[cmd](msg, args);
     } else {

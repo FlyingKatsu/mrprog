@@ -271,54 +271,54 @@ var ENUM = {
             usage: "shutdown",
             value: 1,
             desc: "SHUTS DOWN THE BOT. Tread carefully.",
-            perm: ["mod"],
+            perm: ["mod", "admin"],
             enableDM: true,
-            channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+            channels: [ "main", "battle", "shop", "oc", "debug" ]
         },
         2: {
            id: "test",
            usage: "",
            value: 2,
            desc: "Tests mention embeds",
-           perm: ["mod"],
+           perm: ["mod", "admin"],
            enableDM: true,
-           channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+           channels: [ "debug" ]
         },
         3: {
             id: "help",
             usage: "help [optional arg: public]",
             value: 3,
             desc: "Sends an embedded message with a list of all recognized bot commands.",
-            perm: ["any"],
+            perm: [],
             enableDM: true,
-            channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+            channels: [ "main", "oc", "debug" ]
         },
         4: {
             id: "bases",
             usage: "bases",
             value: 4,
             desc: `Display a list of available Base keywords`,
-            perm: ["any"],
+            perm: [],
             enableDM: true,
-            channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+            channels: [ "main", "oc", "debug" ]
         },
         5: {
             id: "variants",
             usage: "variants [basetype]",
             value: 5,
             desc: `Displays a list of all available variants for the specified Base`,
-            perm: ["any"],
+            perm: [],
             enableDM: true,
-            channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+            channels: [ "main", "oc", "debug" ]
         },
         6: {
             id: "create",
             usage: "create (BASE) (VARIANT) (NAME)",
             value: 6,
             desc: `Creates a character with the given base, variant, and name. To ensure correctness, use placeholders like - or "" to denote default values that are NOT names.`,
-            perm: ["any"],
+            perm: [],
             enableDM: true,
-            channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+            channels: [ "main", "oc", "debug" ]
         },
         7: {
             id: "check",
@@ -327,7 +327,7 @@ var ENUM = {
             desc: `DMs you private info about your partner. Not yet implemented.`,
             perm: ["partnered"],
             enableDM: true,
-            channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+            channels: [ "main", "oc", "debug" ]
         },
         8: {
             id: "stats",
@@ -336,7 +336,7 @@ var ENUM = {
             desc: `Shares public info about your partner. Not yet implemented.`,
             perm: ["partnered"],
             enableDM: true,
-            channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+            channels: [ "main", "oc", "debug" ]
         },
         9: {
             id: "customize",
@@ -345,7 +345,7 @@ var ENUM = {
             desc: `Enables you to change your character's image, color, basetype, variant, etc.  Not yet implemented.`,
             perm: ["partnered"],
             enableDM: true,
-            channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+            channels: [ "main", "oc", "debug" ]
         },
         10: {
             id: "reset",
@@ -354,7 +354,7 @@ var ENUM = {
             desc: `Revert your character to factory settings. Not yet implemented.`,
             perm: ["partnered"],
             enableDM: true,
-            channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+            channels: [ "main", "oc", "debug" ]
         },
         11: {
             id: "netalerts",
@@ -363,7 +363,7 @@ var ENUM = {
             desc: "Check on the status of the Internet. Only partially implemented.",
             perm: ["partnered"],
             enableDM: true,
-            channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+            channels: [ "main", "oc", "debug" ]
         },
         12: {
             id: "jack",
@@ -372,7 +372,7 @@ var ENUM = {
             desc: `Command your character to take part in a challenge! Not yet implemented.`,
             perm: ["partnered"],
             enableDM: true,
-            channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+            channels: [ "main", "battle", "oc", "debug" ]
         },
         13: {
             id: "hey",
@@ -381,25 +381,25 @@ var ENUM = {
             desc: `Greet your character. Partially implemented.`,
             perm: ["partnered"],
             enableDM: true,
-            channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+            channels: [ "main", "battle", "shop", "oc", "debug" ]
         },
         14: {
           id: "clear",
           usage: "clear [Integer number between 2 and 200; Default is 10]",
           value: 14,
           desc: "Delete last INTEGER number of messages in channel.",
-          perm: ["mod"],
+          perm: ["mod", "admin"],
           enableDM: true,
-          channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+          channels: [ "main", "battle", "shop", "oc", "debug" ]
         },
         15: {
             id: "challenge",
             usage: "challenge",
             value: 15,
             desc: "Display a list of available Challenge Modes that are planned.",
-            perm: ["any"],
+            perm: [],
             enableDM: true,
-            channels: [ "main", "info", "battle", "shop", "oc", "debug" ]
+            channels: [ "main", "battle", "shop", "oc", "debug" ]
         },
         16: {
               id: "save",
@@ -408,7 +408,7 @@ var ENUM = {
               desc: "Download a copy of internal files",
               perm: ["partnered"],
               enableDM: true,
-              channels: [ "main", "info", "oc", "debug" ]
+              channels: [ "main", "oc", "debug" ]
           },
         17: {
               id: "load",
@@ -417,7 +417,7 @@ var ENUM = {
               desc: "Upload new internal files",
               perm: ["partnered"],
               enableDM: true,
-              channels: [ "main", "info", "oc", "debug" ]
+              channels: [ "main", "oc", "debug" ]
           }
     }
   },
