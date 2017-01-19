@@ -212,6 +212,7 @@ var UTIL = {
 if (Object.freeze) Object.freeze(UTIL);
 
 var COMMAND = {
+  // Admin / Mod Functions
   shutdown: function(msg, args) {
     SERVER.channels.main
       .sendMessage(`${SERVER.roles.partnered} ${CONFIG.botname} has been taken offline by ${msg.author}`)
@@ -221,9 +222,29 @@ var COMMAND = {
   },
   test: function(msg, args) {
     SERVER.channels.debug
-      .sendEmbed( FORMAT.embed( { description: `This is just a test.` } ) )
+      .sendEmbed( FORMAT.embed( { desc: `This is just a test.` } ) )
       .catch(console.log);
   },
+  clear: function(msg, args) {
+    // TODO: Check user individual permissions to delete messages
+    let numDel = (args[0]) ? parseInt(args[0]) : 10;
+    if (numDel <= 2 || numDel >= 200) {
+      msg.reply( ` CLEAR command accepts only values greater than 2 and less than 200!` )
+        .catch(console.log);
+    } else {
+      msg.channel.bulkDelete(numDel)
+        .then(
+          msg.channel
+            .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
+              'normal', 'warning', 
+              `${numDel} MESSAGES DELETED.`, 
+              `by @${msg.author.username}#${msg.author.discriminator} in #${msg.channel.name}` ) ) )
+            .catch(console.log)
+      ).catch(console.log);
+    }
+  },
+  
+  // Informative Functions
   help: function(msg, args) {
     if( args[0] ) {
       SERVER.channels.info
@@ -236,56 +257,10 @@ var COMMAND = {
         .catch(console.log);
     }
   },
-  bases: function(msg, args) {
-    if ( ENUM.Preset.hasOwnProperty(args[0]) ) {
-      SERVER.channels.info
-        .sendMessage(`Summarizing all variants available for base keyword ${args[0].toUpperCase()}...`)
-        .catch(console.log);
-      SERVER.channels.info
-        .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
-          'normal', 'normal', ENUM.Preset.getSummary(ENUM.Preset[args[0]]), "", 
-          `${args[0].toUpperCase()} Base Variants`, ENUM.Preset.properties[ENUM.Preset[args[0]]].img ) ) )
-        .catch(console.log);
-    } else {
-      SERVER.channels.info
-        .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
-          'normal', 'normal', ENUM.Preset.getDetails(), "", "Available Base Keywords" ) ) )
-        .catch(console.log);
-    }
-  },
-  variants: function(msg, args) {
-    if (ENUM.Preset.hasOwnProperty(args[0])) {
-      let variants = ENUM.Preset.getVariants(BaseTypeEnum[args[0]]);
-
-      if (variants.length == 0) {
-        SERVER.channels.info.sendMessage(`${msg.author}: No variants available for base keyword ${args[0].toUpperCase()}...`);
-
-      } else {
-        SERVER.channels.info.sendMessage(`${msg.author}: Listing all variants for base keyword :${args[0].toUpperCase()}...`);
-        for ( let i=0; i<variants.length; i++ ) {
-          if ( variants[i] != null ) 
-            SERVER.channels.info
-              .sendEmbed( FORMAT.embed(variants[i]) )
-              .catch(console.log);
-        }
-      }
-    } else {
-      if ( args[0] ) {
-        msg.channel
-          .sendEmbed( FORMAT.embed( NPC.getEmbed( 
-            'error', 'error',
-            `ERROR!! ERROR!! ERROR!!\n\nUNRECOGNIZED BASE KEYWORD IN COMMAND:\n\n ${FORMAT.inline("VARIANTS " + args[0].toUpperCase())}\n\nPlease pick a valid base keyword and try this command again`) ) )
-          .catch(console.log);
-        COMMAND.bases(msg, args);
-      } else {
-        FORMAT.embed( NPC.getEmbed( 
-            'error', 'error',
-            `ERROR!! ERROR!! ERROR!!\n\nPlease pick a valid base keyword and try this command again`) )
-          .catch(console.log);
-        COMMAND.bases(msg, args);
-      }
-    }
-  },
+  init: function(msg, args) {},
+  list: function(msg, args) {},
+  
+  // Partner Customization
   create: function(msg, args) {
     /*if ( allPartners.has( msg.author.id ) ) {
       let partner = allPartners.get(msg.author.id);
@@ -328,23 +303,54 @@ var COMMAND = {
         .addRole( SERVER.roles.partnered )
         .catch(console.log);
     //}
+  },  
+  rename: function(msg, args) {},
+  recolor: function(msg, args) {},
+  save: function(msg, args) {
+    // TODO: Process arguments
+    JSONFILE.writeFile("temp/test_" + msg.author.id + ".txt", NPC.guide, {spaces: 2}, function(error){ 
+      console.log("Writing...");
+      console.log("ERROR: " + error);
+      console.log("Done writing!");
+      msg.author.send("Here is your file!", { file: "temp/test_" + msg.author.id + ".txt" })
+        .then( console.log("finished sending the attachment, so delete file and enable user to do read/writes again") )
+        .catch(console.log);
+    });
   },
-  check: function(msg, args) {
-    msg.reply('This feature not yet supported.')
-      .catch(console.log);
-  },
-  stats: function(msg, args) {
-    msg.reply('This feature not yet supported.')
-      .catch(console.log);
-  },
-  customize: function(msg, args) {
-    msg.reply('This feature not yet supported.')
-      .catch(console.log);
+  load: function(msg, args) {
+    // TODO: Process first argument
+    
+    // Get Attachment data
+    if (msg.attachments.size > 0) {
+      console.log("Checking for Attached File");
+      let atfile = msg.attachments.first();      
+      // TODO: Handle Result
+      UTIL.sendFileRequest( atfile.url, 
+        function(json) { console.log("JSON: " + json); },
+        function(status) { console.log("Status Code: " + status.code); console.log("Reason: " + status.reason); }
+        );
+      
+    // Get URL data
+    } else if ( args[1] ) {
+      console.log("Checking for URL");
+      // TODO: Handle Result
+      UTIL.sendFileRequest( args[1], 
+        function(json) { console.log("JSON: " + json); },
+        function(status) { console.log("Status Code: " + status.code); console.log("Reason: " + status.reason); }
+        );
+
+    } else {
+      console.log("No file detected!");
+      console.log(args);
+      return;
+    }
   },
   reset: function(msg, args) {
     msg.reply('This feature not yet supported. Planned for V.0.2.0')
       .catch(console.log);
   },
+  
+  // Partner Interaction
   netalerts: function(msg, args) {
     msg.reply('NOTE: This feature not yet fully supported. Planned for V.0.2.0')
       .catch(console.log);
@@ -397,69 +403,8 @@ var COMMAND = {
         .catch(console.log);
     }
   },
-  clear: function(msg, args) {
-    // TODO: Check user individual permissions to delete messages
-    let numDel = (args[0]) ? parseInt(args[0]) : 10;
-    if (numDel <= 2 || numDel >= 200) {
-      msg.reply( ` CLEAR command accepts only values greater than 2 and less than 200!` )
-        .catch(console.log);
-    } else {
-      msg.channel.bulkDelete(numDel)
-        .then(
-          msg.channel
-            .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
-              'normal', 'warning', 
-              `${numDel} MESSAGES DELETED.`, 
-              `by @${msg.author.username}#${msg.author.discriminator} in #${msg.channel.name}` ) ) )
-            .catch(console.log)
-      ).catch(console.log);
-    }
-  },
-  challenge: function(msg, args) {
-    SERVER.channels.info
-      .sendEmbed( FORMAT.embed ( NPC.announcer.getEmbed( 
-        'normal', 'normal', ENUM.Challenge.getDetails(), "" ) ) )
-      .catch(console.log);
-  },
-  save: function(msg, args) {
-    // TODO: Process arguments
-    JSONFILE.writeFile("temp/test_" + msg.author.id + ".txt", NPC.guide, {spaces: 2}, function(error){ 
-      console.log("Writing...");
-      console.log("ERROR: " + error);
-      console.log("Done writing!");
-      msg.author.send("Here is your file!", { file: "temp/test_" + msg.author.id + ".txt" })
-        .then( console.log("finished sending the attachment, so delete file and enable user to do read/writes again") )
-        .catch(console.log);
-    });
-  },
-  load: function(msg, args) {
-    // TODO: Process first argument
-    
-    // Get Attachment data
-    if (msg.attachments.size > 0) {
-      console.log("Checking for Attached File");
-      let atfile = msg.attachments.first();      
-      // TODO: Handle Result
-      UTIL.sendFileRequest( atfile.url, 
-        function(json) { console.log("JSON: " + json); },
-        function(status) { console.log("Status Code: " + status.code); console.log("Reason: " + status.reason); }
-        );
-      
-    // Get URL data
-    } else if ( args[1] ) {
-      console.log("Checking for URL");
-      // TODO: Handle Result
-      UTIL.sendFileRequest( args[1], 
-        function(json) { console.log("JSON: " + json); },
-        function(status) { console.log("Status Code: " + status.code); console.log("Reason: " + status.reason); }
-        );
-
-    } else {
-      console.log("No file detected!");
-      console.log(args);
-      return;
-    }
-  },
+  status: function(msg, args) {},  
+  
   // Helper functions that used to be part of ENUM.Command
   getDetails: function() {
     let str = ``;
@@ -478,6 +423,63 @@ var COMMAND = {
     } else {
       return UTIL.boolMapReduce( false, ENUM.Command.properties[ENUM.Command[cmd]].channels, UTIL.channelMatch(msg.channel), UTIL.reduceOR ) && this.isUserPermitted( cmd, msg );
     }
+  },
+  
+  bases: function(msg, args) {
+    if ( ENUM.Preset.hasOwnProperty(args[0]) ) {
+      SERVER.channels.info
+        .sendMessage(`Summarizing all variants available for base keyword ${args[0].toUpperCase()}...`)
+        .catch(console.log);
+      SERVER.channels.info
+        .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
+          'normal', 'normal', ENUM.Preset.getSummary(ENUM.Preset[args[0]]), "", 
+          `${args[0].toUpperCase()} Base Variants`, ENUM.Preset.properties[ENUM.Preset[args[0]]].img ) ) )
+        .catch(console.log);
+    } else {
+      SERVER.channels.info
+        .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
+          'normal', 'normal', ENUM.Preset.getDetails(), "", "Available Base Keywords" ) ) )
+        .catch(console.log);
+    }
+  },
+  variants: function(msg, args) {
+    if (ENUM.Preset.hasOwnProperty(args[0])) {
+      let variants = ENUM.Preset.getVariants(BaseTypeEnum[args[0]]);
+
+      if (variants.length == 0) {
+        SERVER.channels.info.sendMessage(`${msg.author}: No variants available for base keyword ${args[0].toUpperCase()}...`);
+
+      } else {
+        SERVER.channels.info.sendMessage(`${msg.author}: Listing all variants for base keyword :${args[0].toUpperCase()}...`);
+        for ( let i=0; i<variants.length; i++ ) {
+          if ( variants[i] != null ) 
+            SERVER.channels.info
+              .sendEmbed( FORMAT.embed(variants[i]) )
+              .catch(console.log);
+        }
+      }
+    } else {
+      if ( args[0] ) {
+        msg.channel
+          .sendEmbed( FORMAT.embed( NPC.getEmbed( 
+            'error', 'error',
+            `ERROR!! ERROR!! ERROR!!\n\nUNRECOGNIZED BASE KEYWORD IN COMMAND:\n\n ${FORMAT.inline("VARIANTS " + args[0].toUpperCase())}\n\nPlease pick a valid base keyword and try this command again`) ) )
+          .catch(console.log);
+        COMMAND.bases(msg, args);
+      } else {
+        FORMAT.embed( NPC.getEmbed( 
+            'error', 'error',
+            `ERROR!! ERROR!! ERROR!!\n\nPlease pick a valid base keyword and try this command again`) )
+          .catch(console.log);
+        COMMAND.bases(msg, args);
+      }
+    }
+  },
+  challenge: function(msg, args) {
+    SERVER.channels.info
+      .sendEmbed( FORMAT.embed ( NPC.announcer.getEmbed( 
+        'normal', 'normal', ENUM.Challenge.getDetails(), "" ) ) )
+      .catch(console.log);
   }
 };
 if (Object.freeze) Object.freeze(COMMAND);
