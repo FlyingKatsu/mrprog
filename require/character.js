@@ -1,6 +1,14 @@
 const CUSTOM = require("custom.js");
 const ENUM = require("enum.js");
 
+const LevelTiers = {
+  scale: { 100, 200, 350, 500, 750, 1000, 1500, 2000, 2500, 3000, 5000  },
+  getTier: function(lvl) {
+    return scale[lvl];
+  }
+};
+
+
 // ===============================================
 // Factory Char properties (to copy or overwrite)
 // ===============================================
@@ -17,6 +25,13 @@ var FactoryChar = function( _input ) {
 FactoryChar.prototype.getVariant = function() {
   return ENUM.Preset.properties[this.baseKey].variants[this.variantKey];
 };
+FactoryChar.prototype.updateXP = function( delta ) {
+  this.xp += delta;
+  if ( this.xp > LevelTiers.getTier(this.level) ) {
+    this.level++;
+    this.xp = 0;
+  }
+};
 
 
 // ===============================================
@@ -30,6 +45,8 @@ var FactoryPartner = function( _input ) {
   this.xp = 0;
   this.mood = 1;
   this.numResets = 0;
+  this.zenny = 0;
+  this.bugfrag = 0;
   this.custom = new CUSTOM.Customization();  
   // Extend FactoryChar
   let temp = new FactoryChar( input );
@@ -49,7 +66,7 @@ FactoryPartner.prototype.getEmbed = function( author, useOC, sit, foot ) {
       this.owner,
       author,
       this.getDialogue( sit, ENUM.Feeling.properties[this.mood] ) ),
-    foot: foot
+    foot: foot || `Level:${this.level}|XP:${this.xp}/${LevelTiers.getTier(this.level)}|Zenny:${this.zenny}|BugFrag:${this.bugfrag}`
   }
 };
 FactoryPartner.prototype.getName = function() {

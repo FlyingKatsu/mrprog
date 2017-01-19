@@ -7,7 +7,6 @@ const CHARACTER = require("./require/character.js");
 
 const JSONFILE = require('jsonfile');
 const REQUEST = require('request');
-//const URL = require('url');
 const DISCORD = require('discord.js');
 const CLIENT = new DISCORD.Client();
 
@@ -107,7 +106,9 @@ var UTIL = {
       
       // Set up roles
       UTIL.setRoles();
+      
     } else {
+      
       // If the guild wasn't found, the SERVER isn't valid
       console.log("Couldn't find the SERVER!");
       SERVER.isValid = false;
@@ -520,13 +521,17 @@ CLIENT.on( 'ready', () => {
   
   if (disconnected) {
     console.log("RECOVERED from D/C");
+    
     CLIENT.user.setAFK(false);
     CLIENT.user.setStatus('online');
     CLIENT.user.setGame(CONFIG.game);
+    
   } else {
+    
     console.log('Mr.Prog the Discord bot is now online');
     CLIENT.user.setGame(CONFIG.game);
     CLIENT.user.setStatus('dnd');
+    
     if ( CONFIG.isDebugMode ) {
       UTIL.setServer( CONFIG.channels.debugmode );
     } else {
@@ -564,7 +569,7 @@ CLIENT.on( 'message', msg => {
         .catch(console.log);
       // Get partner response
       msg.channel
-        .sendEmbed( FORMAT.embed( partner.getEmbed( msg, feeling ) ) )
+        .sendEmbed( FORMAT.embed( partner.getEmbed( msg.author, enableOC, 'feeling', null ) ) )
         .catch(console.log);
     } else {
       // Remind user to create a partner for themselves
@@ -586,6 +591,7 @@ CLIENT.on( 'message', msg => {
   let cmd = args[0].toLowerCase().slice(CONFIG.prefix.length);
   args = args.slice(1);
   
+  // Get the user's name 
   let name = (msg.channel.type === "text") ? msg.member.displayName : msg.author.username;
   
   // Check permissions for the command
@@ -606,9 +612,9 @@ CLIENT.on( 'message', msg => {
       msg.author
         .sendMessage(`${msg.author}, you are not permitted to use ${FORMAT.inline(cmd, CONFIG.prefix)} in ${msg.channel}`)
         .catch(console.log);
-      msg.delete(1000)
+      /*msg.delete(1000)
         .then(msg => console.log(`Deleted message from ${msg.author}`))
-        .catch(console.error);
+        .catch(console.error);*/
     }
   } else {
     // alert that the command wasn't recognized
@@ -619,9 +625,9 @@ CLIENT.on( 'message', msg => {
     msg.author
       .sendMessage(`${msg.author}, type ${FORMAT.inline(cmd, CONFIG.prefix)} to list all recognized commands.`)
       .catch(console.log);
-    msg.delete(1000)
+    /*msg.delete(1000)
       .then(msg => console.log(`Deleted message from ${msg.author}`))
-      .catch(console.error);
+      .catch(console.error);*/
   }
   
 } );
