@@ -1,5 +1,5 @@
-const CUSTOM = require("custom.js");
-const ENUM = require("enum.js");
+const CUSTOM = require("./custom.js");
+const ENUM = require("./enum.js");
 
 const LevelTiers = {
   scale: [ 100, 200, 350, 500, 750, 1000, 1500, 2000, 2500, 3000, 5000 ],
