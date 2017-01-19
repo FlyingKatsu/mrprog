@@ -628,7 +628,7 @@ CLIENT.on( 'message', msg => {
     if ( COMMAND.isPermitted(cmd, msg) ) {
     //if ( true ) {
       // process command
-      COMMAND[cmd](msg, args, useOC);
+      COMMAND[ ENUM.Command.properties[ENUM.Command[cmd]].cmd ](msg, args, useOC);
     } else {
       // alert that this user is not permitted
       msg.author
