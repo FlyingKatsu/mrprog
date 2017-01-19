@@ -556,6 +556,9 @@ CLIENT.on( 'message', msg => {
   // Ignore own messages
   if (msg.author.bot) return;
   
+  // Find out if we should display OC avatars
+  let useOC = CONFIG.EnableOC && SERVER.channels.oc === msg.channel;
+  
   // React to mention at me in MAIN or DM only
   if ( msg.mentions.users.exists('username', SECRET.botuser) 
       && (msg.type === "dm" || msg.channel === SERVER.channels.main) ) {
@@ -564,19 +567,17 @@ CLIENT.on( 'message', msg => {
       // Check in on partner status
       msg.channel
         .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 'normal', 'normal', 
-          `Hello, ${msg.author}!\n\nHow is your ${CONFIG.partnerLabel}, ${partner.name}, doing?`, 
-          null ) ) )
+          `Hello, ${msg.author}!\n\nHow is your ${CONFIG.partnerLabel}, ${partner.name}, doing?` ) ) )
         .catch(console.log);
       // Get partner response
       msg.channel
-        .sendEmbed( FORMAT.embed( partner.getEmbed( msg.author, enableOC, 'feeling', null ) ) )
+        .sendEmbed( FORMAT.embed( partner.getEmbed( msg.author, useOC, 'feeling' ) ) )
         .catch(console.log);
     } else {
       // Remind user to create a partner for themselves
       msg.channel
         .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 'normal', 'normal', 
-          `Hello, ${msg.author}!\n\nType the following to make your own ${CONFIG.partnerLabel}:\n\n${FORMAT.code("create NAME BASE VARIANT", CONFIG.prefix)}`, 
-          null ) ) )
+          `Hello, ${msg.author}!\n\nType the following to make your own ${CONFIG.partnerLabel}:\n\n${FORMAT.code("create NAME BASE VARIANT", CONFIG.prefix)}` ) ) )
         .catch(console.log);
     }
   }
@@ -599,7 +600,6 @@ CLIENT.on( 'message', msg => {
     
     //if ( COMMAND.isPermitted(cmd, msg) ) {
     if ( true ) {
-      let useOC = CONFIG.EnableOC && SERVER.channels.oc === msg.channel;
       // process command
       COMMAND[cmd](msg, args);
     } else {
