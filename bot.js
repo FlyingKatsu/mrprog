@@ -213,7 +213,7 @@ if (Object.freeze) Object.freeze(UTIL);
 
 var COMMAND = {
   // Admin / Mod Functions
-  shutdown: function(msg, args) {
+  shutdown: function(msg, args, useOC) {
     SERVER.channels.main
       .sendMessage(`${SERVER.roles.partnered} ${CONFIG.botname} has been taken offline by ${msg.author}`)
       .catch(console.log);
@@ -245,7 +245,7 @@ var COMMAND = {
   },
   
   // Informative Functions
-  help: function(msg, args) {
+  help: function(msg, args, useOC) {
     if( args[0] ) {
       SERVER.channels.info
         //.sendEmbed( FORMAT.embed( {  } ) )
@@ -257,56 +257,38 @@ var COMMAND = {
         .catch(console.log);
     }
   },
-  init: function(msg, args) {},
-  list: function(msg, args) {},
+  init: function(msg, args, useOC) {},
+  info: function(msg, args, useOC) {},
   
   // Partner Customization
-  create: function(msg, args) {
-    /*if ( allPartners.has( msg.author.id ) ) {
+  create: function(msg, args, useOC) {
+    if ( allPartners.has( msg.author.id ) ) {
       let partner = allPartners.get(msg.author.id);
       msg.reply(`BUT YOU ALREADY HAVE A ${CONFIG.partnerLabel.toUpperCase()}`).catch(console.log);
-      allPartners.get(msg.author.id).respond( msg, 'confused');
-    } else {*/
+      allPartners.get(msg.author.id).respond( msg.author, useOC, 'confused');
+    } else {
 
-      var name = base = variant = null;
-      if(args.length > 2) { // assume name is all of the leftovers
-        base = args[0]; variant = args[1];name = args.slice(2).join("_");
-      } else
-      if ( args.length == 2 ) { // Be smart interpreter
-        if ( ENUM.Preset.hasBase(args[0].toLowerCase()) ) {
-          base = args[0];
-          if ( ENUM.Preset.hasVariant(base.toLowerCase(),args[1].toLowerCase()) ) { variant = args[1]; }
-          else { name = args[1]; }
-        } else { name = args[0]; base = args[1]; }
-      } else
-      if ( args.length == 1 )  { // Assume it is a name or a base
-        if ( ENUM.Preset.hasBase(args[0].toLowerCase()) ) { base = args[0]; }
-        else { name = args[0]; }
-      }
-
-      base = ( base ) ? base.toLowerCase() : null;
-      variant = ( variant ) ? variant.toLowerCase() : null;
-
-      let verifiedBase = ( base === null || ENUM.Preset.hasBase(base) );
-      let verifiedVariant = ( variant === null || ENUM.Preset.hasVariant(base,variant) );
-
-      if ( base === null  || !verifiedBase ) base = ENUM.Preset.properties[ Object.keys(ENUM.Preset.properties)[0] ].id;
-      if ( variant === null || !verifiedVariant ) variant = Object.keys(ENUM.Preset.properties[ENUM.Preset[base]].variants)[0];
-      //console.log(name);
-      name = ( name != null ) ?  name : ENUM.Preset.properties[ENUM.Preset[base]].variants[variant].name;
-      //console.log(base + " " + variant + " " + name);
-      allPartners.set( msg.author.id, new CHARACTER.Partner(msg.author, name, base, variant) );
+      var name = args[0].strip("*") || null,
+          base = args[1].toLowerCase() || null,
+          variant = args[2].toLowerCase() || null;
+      
+      allPartners.set( msg.author.id, 
+        new CHARACTER.Partner( { 
+          owner:msg.author, 
+          name:name, 
+          base:base, 
+          variant:variant } ) );
       msg.channel.sendMessage( FORMAT.embed( 
-        allPartners.get(msg.author.id).getEmbed( msg, 'greeting') ) )
+        allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'greeting') ) )
         .catch(console.log);
       SERVER.guild.member(msg.author)
         .addRole( SERVER.roles.partnered )
         .catch(console.log);
-    //}
+    }
   },  
-  rename: function(msg, args) {},
-  recolor: function(msg, args) {},
-  save: function(msg, args) {
+  rename: function(msg, args, useOC) {},
+  recolor: function(msg, args, useOC) {},
+  save: function(msg, args, useOC) {
     // TODO: Process arguments
     JSONFILE.writeFile("temp/test_" + msg.author.id + ".txt", NPC.guide, {spaces: 2}, function(error){ 
       console.log("Writing...");
@@ -317,7 +299,7 @@ var COMMAND = {
         .catch(console.log);
     });
   },
-  load: function(msg, args) {
+  load: function(msg, args, useOC) {
     // TODO: Process first argument
     
     // Get Attachment data
@@ -345,13 +327,13 @@ var COMMAND = {
       return;
     }
   },
-  reset: function(msg, args) {
+  reset: function(msg, args, useOC) {
     msg.reply('This feature not yet supported. Planned for V.0.2.0')
       .catch(console.log);
   },
   
   // Partner Interaction
-  netalerts: function(msg, args) {
+  netalerts: function(msg, args, useOC) {
     msg.reply('NOTE: This feature not yet fully supported. Planned for V.0.2.0')
       .catch(console.log);
     SERVER.channels.main
@@ -363,7 +345,7 @@ var COMMAND = {
         "") ) )
       .catch(console.log);
   },
-  jack: function(msg, args) {
+  jack: function(msg, args, useOC) {
     if ( allPartners.has(msg.author.id) ) {
       let partner = allPartners.get(msg.author.id);
       if ( args[0] ) {
@@ -396,14 +378,14 @@ var COMMAND = {
     }
     msg.reply('This feature not yet fully supported. Planned for V.0.2.0').catch(console.log);
   },
-  hey: function(msg, args) {
+  hey: function(msg, args, useOC) {
     if(allPartners.has(msg.author.id)) {
       msg.channel
         .sendEmbed( allPartners.get(msg.author.id).getEmbed( msg, 'greeting') )
         .catch(console.log);
     }
   },
-  status: function(msg, args) {},  
+  status: function(msg, args, useOC) {},  
   
   // Helper functions that used to be part of ENUM.Command
   getDetails: function() {
@@ -602,7 +584,7 @@ CLIENT.on( 'message', msg => {
     if ( COMMAND.isPermitted(cmd, msg) ) {
     //if ( true ) {
       // process command
-      COMMAND[cmd](msg, args);
+      COMMAND[cmd](msg, args, useOC);
     } else {
       // alert that this user is not permitted
       msg.author

@@ -47,7 +47,7 @@ var FactoryPartner = function( _input ) {
   this.numResets = 0;
   this.zenny = 0;
   this.bugfrag = 0;
-  this.custom = new CUSTOM.Customization();  
+  this.custom = new CUSTOM.Customization( { name: input.name } );  
   // Extend FactoryChar
   let temp = new FactoryChar( input );
   for (t in temp) { 
