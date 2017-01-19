@@ -70,6 +70,27 @@ var FORMAT = {
     if( input.color ) output.setColor( input.color );
     if( input.foot ) output.setFooter( input.foot );
     return output;
+  },
+  
+  isAlphaNumericJP: function( str ) {
+    // Adapted from Michael Martin-Smucker on StackOverflow
+    // http://stackoverflow.com/questions/4434076/best-way-to-alphanumeric-check-in-javascript/25352300#25352300
+    let code, i, len;    
+    for (i = 0, len = str.length; i < len; i++) {
+      code = str.charCodeAt(i);
+      // NOTE: decimals are shifted by one due to comparison as > < instead of >= <=
+      if (!(code > 47 && code < 58) && // numeric (0-9)
+          !(code > 64 && code < 91) && // upper alpha (A-Z)
+          !(code > 96 && code < 123) && // lower alpha (a-z)
+          // Japanese Chars
+          !(code > 12351 && code < 12448) && // Hiragana 3040-309f
+          !(code > 12447 && code < 12544) && // Katakana 30a0 - 30ff
+          !(code > 65381 && code < 65440) && // Half-width kana ff66 - ff9f
+          !(code > 19967 && code < 40880) && // Common Kanji 4e00 - 9faf
+          !(code > 13311 && code < 19894)) // Rare Kanji 3400 - 4db5
+      { return false; }
+    }
+    return true;
   }
 };
 if (Object.freeze) Object.freeze(FORMAT);
@@ -271,9 +292,17 @@ var COMMAND = {
         .catch(console.log);
     } else {
 
-      var name = args[0].strip("*") || null,
+      var name = args[0].strip("*").strip(CONFIG.suffix) || null,
           base = args[1].toLowerCase() || null,
           variant = args[2].toLowerCase() || null;
+      
+      if ( FORMAT.isAlphaNumericJP( args[0].strip(CONFIG.suffix) ) ) {
+        msg.reply(`${FORMAT.inline(name)} is not a valid [name]\n[name] should be alphanumeric, kana, and/or kanji.\nAny required suffix will be added automatically.`)
+          .catch(console.log);
+        return;
+      }
+      
+      if ( CONFIG.enforceSuffix ) name += CONFIG.suffix;
       
       if ( !ENUM.Preset.hasBase( base ) ) {
         msg.reply(`${FORMAT.inline(base)} is not a recognized [preset]`)
@@ -289,10 +318,10 @@ var COMMAND = {
       
       allPartners.set( msg.author.id, 
         new CHARACTER.Partner( { 
-          owner:msg.author, 
-          name:name, 
-          base:base, 
-          variant:variant } ) );
+          owner: msg.author, 
+          name: name, 
+          base: base, 
+          variant: variant } ) );
       msg.channel.sendMessage( FORMAT.embed( 
         allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'greeting') ) )
         .catch(console.log);

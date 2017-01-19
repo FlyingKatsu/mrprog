@@ -317,10 +317,10 @@ var ENUM = {
           channels: [ "main", "battle", "shop", "oc", "debug" ]
       },
       5: {
-          id: "list",
-          usage: "variants [basetype]",
+          id: "info",
+          usage: "info [option] [suboption]",
           value: 5,
-          desc: `Displays a list of all available variants for the specified Base`,
+          desc: `Lists information about [option], filtered by [suboption].\nCurrently supports the following options:\n*presets* :: List all available preset categories\n*variants [preset]* :: List all available variants for the given [preset]`,
           perm: [],
           enableDM: true,
           channels: [ "main", "oc", "debug" ]
@@ -328,18 +328,18 @@ var ENUM = {
 
       6: {
           id: "create",
-          usage: "create (BASE) (VARIANT) (NAME)",
+          usage: "create [name] [preset] [variant]",
           value: 6,
-          desc: `Creates a character with the given base, variant, and name. To ensure correctness, use placeholders like - or "" to denote default values that are NOT names.`,
+          desc: `Creates a character named [name] using the [variant] of [preset] and makes it your partner.\n[name] should be alphanumeric, kana, and/or kanji.\nAny required extension will be added automatically.\nUse * to use a default name.\n[variant] is optional, but [preset] is required if [variant] is supplied`,
           perm: [],
           enableDM: true,
           channels: [ "main", "oc", "debug" ]
       },
       7: {
           id: "rename",
-          usage: "check",
+          usage: "rename [name]",
           value: 7,
-          desc: `DMs you private info about your partner. Not yet implemented.`,
+          desc: `Change your partner's name to [name].\n[name] should be alphanumeric, kana, and/or kanji.\nAny required extension will be added automatically.`,
           perm: ["partnered"],
           enableDM: true,
           channels: [ "main", "oc", "debug" ]
