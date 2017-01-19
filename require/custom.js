@@ -34,7 +34,12 @@ var CUSTOM = {
     this.okay = input.okay || null;
     this.withdrawn = input.withdrawn || null;
     this.upset = input.upset || null;
+  },
+  
+  replaceTextVar: function( owner, user, text ) {
+    return text.replace(/@Owner/ig, owner.toString()).replace(/@User/ig, user.toString());
   }
+  
 };
 
 if (Object.freeze) Object.freeze(CUSTOM);

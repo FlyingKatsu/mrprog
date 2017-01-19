@@ -39,13 +39,16 @@ var FactoryPartner = function( _input ) {
 };
 // Inherited methods for FactoryPartner
 // PARTNER GETTERS
-FactoryPartner.prototype.getEmbed = function( sit, useOC, foot ) {
+FactoryPartner.prototype.getEmbed = function( author, useOC, sit, foot ) {
   console.log("Partner Embed");
   return {
     author: this.getName(),
     thumb: this.getImg( useOC ),
     color: this.getColor(),
-    desc: this.getDialogue( sit, ENUM.Feeling.properties[this.mood] ),
+    desc: CUSTOM.replaceTextVar( 
+      this.owner,
+      author,
+      this.getDialogue( sit, ENUM.Feeling.properties[this.mood] ) ),
     foot: foot
   }
 };
