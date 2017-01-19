@@ -264,13 +264,28 @@ var COMMAND = {
   create: function(msg, args, useOC) {
     if ( allPartners.has( msg.author.id ) ) {
       let partner = allPartners.get(msg.author.id);
-      msg.reply(`BUT YOU ALREADY HAVE A ${CONFIG.partnerLabel.toUpperCase()}`).catch(console.log);
-      allPartners.get(msg.author.id).respond( msg.author, useOC, 'confused');
+      msg.reply(`BUT YOU ALREADY HAVE A ${CONFIG.partnerLabel.toUpperCase()}`)
+        .catch(console.log);
+      msg.channel.sendMessage( FORMAT.embed( 
+        allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'confused') ) )
+        .catch(console.log);
     } else {
 
       var name = args[0].strip("*") || null,
           base = args[1].toLowerCase() || null,
           variant = args[2].toLowerCase() || null;
+      
+      if ( !ENUM.Preset.hasBase( base ) ) {
+        msg.reply(`${FORMAT.inline(base)} is not a recognized [preset]`)
+          .catch(console.log);
+        return;
+      }
+      
+      if ( !ENUM.Preset.hasVariant( base, variant ) ) {
+        msg.reply(`${FORMAT.inline(base)} ${FORMAT.inline(variant)} is not a recognized [preset] [variant] pair`)
+          .catch(console.log);
+        return;
+      }
       
       allPartners.set( msg.author.id, 
         new CHARACTER.Partner( { 
