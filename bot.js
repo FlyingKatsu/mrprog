@@ -188,25 +188,18 @@ var UTIL = {
     }
   },
   
-  isFilePermitted: function( ) {
-    /*let type = header.content-type.split(" ")[0]
-    if ( type !== "text/plain" && type !== "application/json") return false;
-    if ( header.transfer-encoding === "chunked" ) {
-      console.log("TODO: Count bytes as they arrive");
-    } else {
-      return header.content-length <= 1000000; //1MB
-    }*/
-    return true;
-  },
-  
-  sendFileRequest: function( uri, callbackA, callbackB ) {
+  sendFileRequest: function( uri, expectedType, dataHandler, statusResponder ) {
     
     REQUEST( uri , function(error, response, body) {      
       if( !error && response.statusCode === 200 ) {
-        callbackA( JSON.parse(body) );
+        if ( expectedType === "image" ) {
+          dataHandler( response );
+        } else {
+          dataHandler( JSON.parse(body) );
+        }
       } else {
         console.log("There was an error loading your file...\n" + error);
-        callbackA( {} );
+        dataHandler( );
       }
       console.log("========");
     })
@@ -215,12 +208,22 @@ var UTIL = {
         let invalidCode = "";
         
         let ctype = response.headers["content-type"].split(" ")[0];
-        if( !ctype.includes("text/plain") && !ctype.includes("application/json") ) {
-          console.log("Type: " + ctype);
-          console.log("Wrong File Type!  Aborting...");
-          invalidCode = "filetype";
-          self.abort();
+        if( expectedType === "image" ) {
+          if( !ctype.includes("image/") && !ctype.includes("image/") ) {
+            console.log("Type: " + ctype);
+            console.log("Wrong File Type!  Expected Image.  Aborting...");
+            invalidCode = "filetype";
+            self.abort();
+          }
+        } else {
+          if( !ctype.includes("text/plain") && !ctype.includes("application/json") ) {
+            console.log("Type: " + ctype);
+            console.log("Wrong File Type!  Expected JSON Text.  Aborting...");
+            invalidCode = "filetype";
+            self.abort();
+          }
         }
+        
       
         let byteCounter = 0;
         response.on( 'data', function( data ) { 
@@ -238,7 +241,7 @@ var UTIL = {
         } );
         response.on( 'end', function() {
           console.log("Finished loading file request");
-          callbackB( { code: this.statusCode, reason: invalidCode } );
+          statusResponder( { code: this.statusCode, reason: invalidCode } );
         } );
       } );
   }
@@ -389,52 +392,165 @@ var COMMAND = {
         allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'customized') ) )
         .catch(console.log);
     } else {
+      this.feedbackError( 
+        `BUT YOU DON'T HAVE A ${CONFIG.partnerLabel.toUpperCase()} YET!!`, 
+        msg );
+    }
+  },
+  save: function(msg, args, useOC) {
+    // Check if really partnered
+    if ( allPartners.has( msg.author.id ) ) {
+      let partner = allPartners.get(msg.author.id);
+      
+      // Process arguments
+      if ( args[0] ) {
+        let option = args[0].toLowerCase();
+        let output = (this.saveArgs.hasOwnProperty(option)) ?
+            this.saveArgs.[option]( msg, partner, useOC ) : null;
+        if (!output) {
+          this.feedbackError( ` ${option} is not a valid option.`, msg, useOC, partner );
+          return;
+        }
+        
+        JSONFILE.writeFile(output.file, output.customdata, {spaces: 2}, function(error){ 
+          console.log("Writing...");
+          console.log("ERROR: " + error);
+          console.log("Done writing!");
+          msg.author.send(`Here is your ${option} file!`, { file: output.file })
+            .then( console.log("finished sending the attachment, so delete file and enable user to do read/writes again") )
+            .catch(console.log);
+        });
+      } else {
+        msg.reply(`You did not specify what file you wanted to download.`)
+          .catch(console.log);
+        msg.channel.sendMessage( FORMAT.embed( 
+          allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'confused') ) )
+          .catch(console.log);
+      }
+      
+    } else {
       msg.reply(`BUT YOU DON'T HAVE A ${CONFIG.partnerLabel.toUpperCase()} YET!!`)
         .catch(console.log);
     }
   },
-  save: function(msg, args, useOC) {
-    // TODO: Process arguments
-    JSONFILE.writeFile("temp/test_" + msg.author.id + ".txt", NPC.guide, {spaces: 2}, function(error){ 
-      console.log("Writing...");
-      console.log("ERROR: " + error);
-      console.log("Done writing!");
-      msg.author.send("Here is your file!", { file: "temp/test_" + msg.author.id + ".txt" })
-        .then( console.log("finished sending the attachment, so delete file and enable user to do read/writes again") )
-        .catch(console.log);
-    });
+  saveArgs: {
+    dialogue: function( msg, partner, useOC ) {
+      return { 
+        customdata: partner.getModifierSet(), 
+        file: `temp/dialogue_${msg.author.username}_${msg.author.discriminator}.txt` 
+      };
+    },
+    partition: function( msg, partner, useOC ) {
+      msg.reply("this hasn't been implemented yet!").catch(console.log);
+      return;
+    },
+    folder: function( msg, partner, useOC ) {
+      msg.reply("this hasn't been implemented yet!").catch(console.log);
+      return;
+    }    
   },
   load: function(msg, args, useOC) {
-    // TODO: Process first argument
-    
-    // Get Attachment data
-    if (msg.attachments.size > 0) {
-      console.log("Checking for Attached File");
-      let atfile = msg.attachments.first();      
-      // TODO: Handle Result
-      UTIL.sendFileRequest( atfile.url, 
-        function(json) { console.log("JSON: " + json); },
-        function(status) { console.log("Status Code: " + status.code); console.log("Reason: " + status.reason); }
-        );
+    // Check if really partnered
+    if ( allPartners.has( msg.author.id ) ) {
+      let partner = allPartners.get(msg.author.id);
       
-    // Get URL data
-    } else if ( args[1] ) {
-      console.log("Checking for URL");
-      // TODO: Handle Result
-      UTIL.sendFileRequest( args[1], 
-        function(json) { console.log("JSON: " + json); },
-        function(status) { console.log("Status Code: " + status.code); console.log("Reason: " + status.reason); }
-        );
+      // Process arguments
+      if ( args[0] ) {
+        let option = args[0].toLowerCase();
+        let output = (this.saveArgs.hasOwnProperty(option)) ?
+            this.saveArgs.[option]( msg, partner, useOC ) : null;
+        if (!output) {
+          this.feedbackError( ` ${option} is not a valid option.`, msg, useOC, partner );
+          return;
+        }
+        
+        // Get Attachment data
+        if (msg.attachments.size > 0) {
+          console.log("Checking for Attached File");
+          let atfile = msg.attachments.first();
+          
+          UTIL.sendFileRequest( atfile.url, output.dataHandler, output.statusResponder );
 
+        // Get URL data
+        } else if ( args[1] ) {
+          console.log("Checking for URL");
+          
+          UTIL.sendFileRequest( args[1], output.dataHandler, output.statusResponder );
+
+        } else {
+          console.log("No file detected!");
+          console.log(args);
+          this.feedbackError( 
+            `You did not provide a file or file URL.`, 
+            msg, useOC, partner );
+          return;
+        }
+        
+      } else {
+        this.feedbackError( 
+          `You did not specify what file you wanted to upload.`, 
+          msg, useOC, partner );
+      }
+      
     } else {
-      console.log("No file detected!");
-      console.log(args);
+      this.feedbackError( 
+        `BUT YOU DON'T HAVE A ${CONFIG.partnerLabel.toUpperCase()} YET!!`, 
+        msg );
+    }
+    
+  },
+  loadArgs: {
+    avatar: function( msg, partner, useOC ) {
+      return {
+        dataHandler: function( response ) {
+          console.log(JSON.stringify(response));
+        },
+        statusResponder: function( status ) {
+          console.log("Status Code: " + status.code);
+          console.log("Reason: " + status.reason);
+        }
+      };
+    },
+    dialogue: function( msg, partner, useOC ) {
+      msg.reply("this hasn't been implemented yet!").catch(console.log);
+      return {
+        dataHandler: function( json ) {
+          console.log("JSON: " + json);
+        },
+        statusResponder: function( status ) {
+          console.log("Status Code: " + status.code);
+          console.log("Reason: " + status.reason);
+        }
+      };
+    },
+    partition: function( msg, partner, useOC ) {
+      msg.reply("this hasn't been implemented yet!").catch(console.log);
+      return;
+    },
+    folder: function( msg, partner, useOC ) {
+      msg.reply("this hasn't been implemented yet!").catch(console.log);
       return;
     }
   },
   reset: function(msg, args, useOC) {
-    msg.reply('This feature not yet supported. Planned for V.0.2.0')
-      .catch(console.log);
+    // Check if really partnered
+    if ( allPartners.has( msg.author.id ) ) {
+      let partner = allPartners.get(msg.author.id);
+      
+      // Reset the custom property, incrementing numReset
+      partner.reset();
+      
+      // Bootup
+      msg.channel.sendMessage( FORMAT.embed( 
+        allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'greeting') ) )
+        .catch(console.log);
+      
+    } else {
+      this.feedbackError( 
+        `BUT YOU DON'T HAVE A ${CONFIG.partnerLabel.toUpperCase()} YET!!`, 
+        msg );
+    }
+    
   },
   
   // Partner Interaction
@@ -567,6 +683,14 @@ var COMMAND = {
       .sendEmbed( FORMAT.embed ( NPC.announcer.getEmbed( 
         'normal', 'normal', ENUM.Challenge.getDetails(), "" ) ) )
       .catch(console.log);
+  },
+  feedbackError( text, msg, useOC, partner, useOC ) {
+    msg.reply(text).catch(console.log);
+    if ( partner ) {
+      msg.channel.sendMessage( FORMAT.embed( 
+        allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'confused') ) )
+        .catch(console.log);
+    }
   }
 };
 if (Object.freeze) Object.freeze(COMMAND);

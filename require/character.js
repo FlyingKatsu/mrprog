@@ -55,9 +55,19 @@ var FactoryPartner = function( _input ) {
   }
 };
 // Inherited methods for FactoryPartner
+FactoryPartner.prototype.reset = function() {
+  this.numResets++;
+  this.custom = new CUSTOM.Customization();
+};
+FactoryPartner.prototype.applyMod = function( num ) {
+  this.mood += num;
+  if ( this.mood > 5 ) this.mood = 5;
+  if ( this.mood < -5 ) this.mood = -5;
+};
+
 // PARTNER GETTERS
 FactoryPartner.prototype.getEmbed = function( author, useOC, sit, foot ) {
-  console.log("Partner Embed");
+  this.applyMod(this.getModifier(sit));
   return {
     author: this.getName(),
     thumb: this.getImg( useOC ),
@@ -65,7 +75,7 @@ FactoryPartner.prototype.getEmbed = function( author, useOC, sit, foot ) {
     desc: CUSTOM.replaceTextVar( 
       this.owner,
       author,
-      this.getDialogue( sit, ENUM.Feeling.properties[this.mood] ) ),
+      this.getDialogue( sit, ENUM.Feeling.properties[parseInt(this.mood)] ) ),
     foot: foot || `Level:${this.level}|XP:${this.xp}/${LevelTiers.getTier(this.level)}|Zenny:${this.zenny}|BugFrag:${this.bugfrag}`
   }
 };
@@ -90,6 +100,10 @@ FactoryPartner.prototype.getAlignment = function() {
   };
 FactoryPartner.prototype.getPersonality = function() {
     return this.custom.personality || this.getVariant().custom.personality;
+  };
+FactoryPartner.prototype.getModifierSet = function( ) {
+    return this.custom.modifiers || 
+      ENUM.Personality.properties[ENUM.Personality[this.getPersonality()]].modifiers;
   };
 FactoryPartner.prototype.getModifier = function( sit ) {
     return this.custom.modifiers[sit].mod || 
