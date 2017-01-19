@@ -79,7 +79,7 @@ var FORMAT = {
       // NOTE: decimals are shifted by one due to comparison as > < instead of >= <=
       if (!(code > 47 && code < 58) && // numeric (0-9)
           !(code > 64 && code < 71) && // upper alpha (A-F)
-          !(code > 96 && code < 103) && // lower alpha (a-f)
+          !(code > 96 && code < 103) ) // lower alpha (a-f)
       { return false; }
     }
     return true;
@@ -406,7 +406,7 @@ var COMMAND = {
       if ( args[0] ) {
         let option = args[0].toLowerCase();
         let output = (this.saveArgs.hasOwnProperty(option)) ?
-            this.saveArgs.[option]( msg, partner, useOC ) : null;
+            this.saveArgs[option]( msg, partner, useOC ) : null;
         if (!output) {
           this.feedbackError( ` ${option} is not a valid option.`, msg, useOC, partner );
           return;
@@ -458,7 +458,7 @@ var COMMAND = {
       if ( args[0] ) {
         let option = args[0].toLowerCase();
         let output = (this.saveArgs.hasOwnProperty(option)) ?
-            this.saveArgs.[option]( msg, partner, useOC ) : null;
+            this.loadArgs[option]( msg, partner, useOC ) : null;
         if (!output) {
           this.feedbackError( ` ${option} is not a valid option.`, msg, useOC, partner );
           return;
@@ -684,7 +684,7 @@ var COMMAND = {
         'normal', 'normal', ENUM.Challenge.getDetails(), "" ) ) )
       .catch(console.log);
   },
-  feedbackError( text, msg, useOC, partner, useOC ) {
+  feedbackError( text, msg, useOC, partner ) {
     msg.reply(text).catch(console.log);
     if ( partner ) {
       msg.channel.sendMessage( FORMAT.embed( 
