@@ -144,14 +144,14 @@ var ENUM = {
         desc: "Default dialogue lines for anyone",
         value: 1,
         modifiers: {
-          greeting: { mod: null, dialogue: { 
+          greeting: { mod: 0.1, dialogue: { 
             happy: "Hello, @user!", 
             content: "", 
             okay: "", 
             withdrawn: "", 
             upset: "" 
           }  },
-          feeling: { mod: null, dialogue: { 
+          feeling: { mod: 0.1, dialogue: { 
             happy: "I'm doing great! How are you, @user?", 
             content: "", 
             okay: "", 
@@ -228,14 +228,14 @@ var ENUM = {
             withdrawn: "", 
             upset: "" 
           } },
-          confused: { mod: null, dialogue: { 
+          confused: { mod: -0.25, dialogue: { 
             happy: "Hahaha, @User did you mess up again?", 
             content: "@User, I don't think that's what you meant to do", 
             okay: "@User, I don't understand...", 
             withdrawn: "...", 
             upset: "How stupid." 
           } },
-          customized: { mod: null, dialogue: { 
+          customized: { mod: -0.5, dialogue: { 
             happy: "@User, thanks for the upgrade!", 
             content: "@User, do you think this suits me better?", 
             okay: "@User, I don't know if this suits me, but okay.", 
