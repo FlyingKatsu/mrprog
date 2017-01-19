@@ -605,11 +605,10 @@ CLIENT.on( 'message', msg => {
       // alert that this user is not permitted
       msg.author
         .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 'error', 'error', 
-        `ERROR!! ERROR!! ERROR!!\n\n${FORMAT.code(`User: ${name}\nChannel: ${msg.channel.name}\nCommand: ${CONFIG.prefix}${args.join(" ")}`)}\n\nACCESS DENIED!!`,
-        null ) ) )
+        `ERROR!! ERROR!! ERROR!!\n\n${FORMAT.code(`User: ${name}\nChannel: ${msg.channel.name}\nCommand: ${CONFIG.prefix}${cmd}${args.join(" ")}`)}\n\nACCESS DENIED!!`) ) )
         .catch(console.log);
       msg.author
-        .sendMessage(`${msg.author}, you are not permitted to use ${FORMAT.inline(cmd, CONFIG.prefix)} in ${msg.channel}`)
+        .sendMessage(`${name}, you are not permitted to use ${FORMAT.inline(cmd, CONFIG.prefix)} in ${msg.channel}`)
         .catch(console.log);
       /*msg.delete(1000)
         .then(msg => console.log(`Deleted message from ${msg.author}`))
@@ -619,10 +618,10 @@ CLIENT.on( 'message', msg => {
     // alert that the command wasn't recognized
     msg.author
       .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 'error', 'error', 
-      `ERROR!! ERROR!! ERROR!!\n\n${FORMAT.code(`User: ${name}\nChannel: ${msg.channel.name}\nCommand: ${CONFIG.prefix}${args.join(" ")}`)}\n\nCOMMAND NOT RECOGNIZED!!`, null ) ) )
+      `ERROR!! ERROR!! ERROR!!\n\n${FORMAT.code(`User: ${name}\nChannel: ${msg.channel.name}\nCommand: ${CONFIG.prefix}${cmd}${args.join(" ")}`)}\n\nCOMMAND NOT RECOGNIZED!!`) ) )
       .catch(console.log);
     msg.author
-      .sendMessage(`${msg.author}, type ${FORMAT.inline(cmd, CONFIG.prefix)} to list all recognized commands.`)
+      .sendMessage(`${name}, type ${FORMAT.inline(cmd, CONFIG.prefix)} to list all recognized commands.`)
       .catch(console.log);
     /*msg.delete(1000)
       .then(msg => console.log(`Deleted message from ${msg.author}`))
