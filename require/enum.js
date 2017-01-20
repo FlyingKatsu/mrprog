@@ -328,113 +328,113 @@ var ENUM = {
         enableDM: true,
         channels: [ "main", "battle", "shop", "oc", "debug" ]
       },
-      5: {
+      6: {
         id: "info",
         usage: "info [option] [suboption]",
         cmd: "info",
-        value: 5,
+        value: 6,
         desc: `Lists information about [option], filtered by [suboption].\nCurrently supports the following options:\n*presets* :: List all available preset categories\n*variants [preset]* :: List all available variants for the given [preset]`,
         perm: [],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
       },
       
-      6: {
+      7: {
         id: "create",
         usage: "create [name] [preset] [variant]",
         cmd: "create",
-        value: 6,
+        value: 7,
         desc: `Creates a character named [name] using the [variant] of [preset] and makes it your partner.\n[name] should be alphanumeric, kana, and/or kanji.\nAny required extension will be added automatically.\nUse * to use a default name.\n[variant] is optional, but [preset] is required if [variant] is supplied`,
         perm: [],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
       },
-      7: {
+      8: {
         id: "rename",
         usage: "rename [name]",
         cmd: "rename",
-        value: 7,
+        value: 8,
         desc: `Change your partner's name to [name].\n[name] should be alphanumeric, kana, and/or kanji.\nAny required extension will be added automatically.`,
         perm: ["partnered"],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
       },
-      8: {
+      9: {
         id: "recolor",
         usage: "recolor [hexcolor]",
         cmd: "recolor",
-        value: 8,
+        value: 9,
         desc: `Change your partner's dialogue box color to [hexcolor]\n[hexcolor] is a hexadecimal color code such as #FF0000`,
         perm: ["partnered"],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
       },
-      16: {
+      10: {
         id: "save",
         usage: "save (dialogue|partition|folder)",
         cmd: "save",
-        value: 16,
+        value: 10,
         desc: "Download a copy of the specified data file\nCurrently only supports the dialogue option.",
         perm: ["partnered"],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
         },
-      17: {
+      11: {
         id: "load",
         usage: "load (avatar|dialogue|partition|folder) [url]",
         cmd: "load",
-        value: 17,
+        value: 11,
         desc: "Upload a copy of the specified data file.\nThe file can be an attachment, or you can supply the optional [url] to the file (good for iOS which doesn't have a normal filesystem)\nCurrently only supports the dialogue and avatar options.",
         perm: ["partnered"],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
         },
-      10: {
+      12: {
         id: "reset",
         usage: "reset",
         cmd: "reset",
-        value: 10,
+        value: 12,
         desc: `Revert your character to factory settings. Not yet implemented.`,
         perm: ["partnered"],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
       },
 
-      11: {
+      13: {
         id: "netalerts",
         usage: "netalerts",
         cmd: "netalerts",
-        value: 11,
+        value: 13,
         desc: "Check on the status of the Internet. Only partially implemented.",
         perm: ["partnered"],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
       },
-      12: {
+      14: {
         id: "jack",
         usage: "jack (in|out)",
         cmd: "jack",
-        value: 12,
+        value: 14,
         desc: `Command your character to take part in a challenge (or bail)!\nNot yet implemented.`,
         perm: ["partnered"],
         enableDM: true,
         channels: [ "main", "battle", "oc", "debug" ]
       },
-      13: {
+      15: {
         id: "hey",
         usage: "hey",
         cmd: "hey",
-        value: 13,
+        value: 15,
         desc: `Greet your character. Partially implemented.`,
         perm: ["partnered"],
         enableDM: true,
         channels: [ "main", "battle", "shop", "oc", "debug" ]
       },        
-      15: {
+      16: {
         id: "status",
         usage: "status",
         cmd: "status",
-        value: 15,
+        value: 16,
         desc: "Get a DM with current information about your partner, such as level, xp, mood, currency, and battle stats",
         perm: [],
         enableDM: true,

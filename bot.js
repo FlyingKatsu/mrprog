@@ -28,6 +28,15 @@ const SERVER = {
   isValid: true
 };
 
+const COMMONREGEX = {
+  asterix: /\*/ig,
+  hash: /#/ig,
+  suffix: /\.EXE/ig // TODO: make this not hardcoded
+};
+
+String.prototype.strip = function(v) {
+  return this.replace( COMMONREGEX[v] , "");
+}
 
 // =========================================================
 //  STATE VARIABLES
@@ -316,11 +325,18 @@ var COMMAND = {
         .catch(console.log);
     } else {
 
-      var name = args[0].strip("*").strip(CONFIG.suffix) || null,
-          base = args[1].toLowerCase() || null,
-          variant = args[2].toLowerCase() || null;
+      var name = args[0] || "",
+          base = args[1] || "",
+          variant = args[2] || "";
       
-      if ( FORMAT.isAlphaNumericJP( args[0].strip(CONFIG.suffix) ) ) {
+      console.log(name);      
+      if (name) name = name.strip("asterix").strip("suffix");
+      console.log(name);      
+      
+      if (base) base = base.toLowerCase();
+      if (variant) variant = variant.toLowerCase();
+      
+      if ( !FORMAT.isAlphaNumericJP( name ) ) {
         msg.reply(`${FORMAT.inline(name)} is not a valid [name]\n[name] should be alphanumeric, kana, and/or kanji.\nAny required suffix will be added automatically.`)
           .catch(console.log);
         return;
@@ -355,9 +371,10 @@ var COMMAND = {
     }
   },  
   rename: function(msg, args, useOC) {
-    let name = args[0].strip("*").strip(CONFIG.suffix) || null;
+    var name = args[0] || "";
+    if (name) name = name.strip("asterix").strip("suffix");
       
-    if ( FORMAT.isAlphaNumericJP( args[0].strip(CONFIG.suffix) ) ) {
+    if ( !FORMAT.isAlphaNumericJP( name ) ) {
       msg.reply(`${FORMAT.inline(name)} is not a valid [name]\n[name] should be alphanumeric, kana, and/or kanji.\nAny required suffix will be added automatically.`)
         .catch(console.log);
       return;
@@ -377,9 +394,9 @@ var COMMAND = {
     }
   },
   recolor: function(msg, args, useOC) {
-    let color = args[0].strip("#").slice(0,6);
+    let color = args[0].strip("hash").slice(0,6);
         
-    if ( FORMAT.isHexCode( color ) ) {
+    if ( !FORMAT.isHexCode( color ) ) {
       msg.reply(`${FORMAT.inline(color)} is not a valid [hexcolor]!`)
         .catch(console.log);
       return;
