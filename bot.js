@@ -966,7 +966,7 @@ CLIENT.on( 'message', msg => {
       // alert that this user is not permitted
       msg.author
         .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 'error', 'error', 
-        `ERROR!! ERROR!! ERROR!!\n\n${FORMAT.code(`User: ${name}\nChannel: ${msg.channel.name}\nCommand: ${CONFIG.prefix}${cmd}${args.join("   ")}`)}\n\nACCESS DENIED!!`) ) )
+        `ERROR!! ERROR!! ERROR!!\n\n${FORMAT.code(`User: ${name}\nChannel: ${msg.channel.name}\nCommand: ${CONFIG.prefix}${cmd} ${args.join(" ")}`)}\n\nACCESS DENIED!!`) ) )
         .catch(console.log);
       msg.author
         .sendMessage(`${name}, you are not permitted to use ${FORMAT.inline(cmd, CONFIG.prefix)} in ${msg.channel}`)
@@ -979,7 +979,7 @@ CLIENT.on( 'message', msg => {
     // alert that the command wasn't recognized
     msg.author
       .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 'error', 'error', 
-      `ERROR!! ERROR!! ERROR!!\n\n${FORMAT.code(`User: ${name}\nChannel: ${msg.channel.name}\nCommand: ${CONFIG.prefix}${cmd}${args.join("   ")}`)}\n\nCOMMAND NOT RECOGNIZED!!`) ) )
+      `ERROR!! ERROR!! ERROR!!\n\n${FORMAT.code(`User: ${name}\nChannel: ${msg.channel.name}\nCommand: ${CONFIG.prefix}${cmd} ${args.join(" ")}`)}\n\nCOMMAND NOT RECOGNIZED!!`) ) )
       .catch(console.log);
     msg.author
       .sendMessage(`${name}, type ${FORMAT.inline(ENUM.Command.properties[ENUM.Command["help"]].id, CONFIG.prefix)} to list all recognized commands.`)
