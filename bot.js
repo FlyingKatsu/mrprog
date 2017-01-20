@@ -352,9 +352,38 @@ var COMMAND = {
           base = args[1] || null,
           variant = args[2] || null;
       
-      if (name) name = name.strip("asterix").strip("suffix");
-      if (base) base = base.toLowerCase();
-      if (variant) variant = variant.toLowerCase();
+      // Check Base
+      if (base) {
+        base = base.toLowerCase();
+      } else {
+        base = ENUM.Preset.properties[1].id;
+      }
+      
+      if ( !ENUM.Preset.hasBase( base ) ) {
+        msg.reply(`${FORMAT.inline(base)} is not a recognized [preset]`)
+          .catch(console.log);
+        return;
+      }
+      
+      // Check Variant
+      if (variant) {
+        variant = variant.toLowerCase();
+      } else {
+        variant = Object.keys(ENUM.Preset.properties[ENUM.Preset[base]].variants)[0];
+      }
+      
+      if ( !ENUM.Preset.hasVariant( base, variant ) ) {
+        msg.reply(`${FORMAT.inline(base)} ${FORMAT.inline(variant)} is not a recognized [preset] [variant] pair`)
+          .catch(console.log);
+        return;
+      }
+      
+      // Check Name
+      if (name && name.strip("asterix")) {
+        name = name.strip("suffix");
+      } else {
+        name = ENUM.Preset.properties[ENUM.Preset[base]].variants[variant].custom.name.strip("suffix");
+      }
       
       if ( !name || ( name && !FORMAT.isAlphaNumericJP( name ) ) ) {
         msg.reply(`${FORMAT.inline(name)} is not a valid [name]\n[name] should be alphanumeric, kana, and/or kanji.\nAny required suffix will be added automatically.`)
@@ -364,18 +393,7 @@ var COMMAND = {
       
       if ( CONFIG.enforceSuffix ) name += CONFIG.suffix;
       
-      if ( !ENUM.Preset.hasBase( base ) ) {
-        msg.reply(`${FORMAT.inline(base)} is not a recognized [preset]`)
-          .catch(console.log);
-        return;
-      }
-      
-      if ( !ENUM.Preset.hasVariant( base, variant ) ) {
-        msg.reply(`${FORMAT.inline(base)} ${FORMAT.inline(variant)} is not a recognized [preset] [variant] pair`)
-          .catch(console.log);
-        return;
-      }
-      
+      // Create new
       allPartners.set( msg.author.id, 
         new CHARACTER.Partner( { 
           owner: msg.author, 
@@ -392,7 +410,7 @@ var COMMAND = {
   },  
   rename: function(msg, args, useOC) {
     var name = args[0] || null;
-    if (name) name = name.strip("asterix").strip("suffix");
+    if (name) name = name.strip("suffix");
       
     if ( !name || ( name && !FORMAT.isAlphaNumericJP( name ) ) ) {
       msg.reply(`${FORMAT.inline(name)} is not a valid [name]\n[name] should be alphanumeric, kana, and/or kanji.\nAny required suffix will be added automatically.`)

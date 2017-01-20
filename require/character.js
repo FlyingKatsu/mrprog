@@ -16,7 +16,7 @@ var FactoryChar = function( _input ) {
     let input = _input || {};
     this.owner = input.owner || null;
     this.baseKey = ENUM.Preset[input.base] || 1;
-    this.variantKey = input.variant || 0;
+    this.variantKey = input.variant || Object.keys(ENUM.Preset.properties[baseKey].variants)[0];
     this.level = input.level || 0;
 };
 // ===============================================
