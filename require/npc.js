@@ -5,8 +5,8 @@ var FactoryNPC = function( input ) {
   this.name = input.name || "NPC";
   this.color = input.color || {
     normal: "#70C040",
-    warning: "#DF6777",
-    error: "#FAA61A"
+    warning: "#FAA61A",
+    error: "#DF6777"
   };
   this.img = input.img || {
     normal: "https://cdn.pbrd.co/images/hXrbGDHil.png",
