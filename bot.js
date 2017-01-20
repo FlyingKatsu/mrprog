@@ -287,11 +287,11 @@ var COMMAND = {
       
       channel.bulkDelete(numDel)
         .then(
-          msg.channel
+          channel
             .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
               'normal', 'warning', 
               `${numDel} MESSAGES DELETED.`, 
-              `by @${msg.author.username}#${msg.author.discriminator} in #${msg.channel.name}` ) ) )
+              `by @${msg.author.username}#${msg.author.discriminator} in #${channel.name}` ) ) )
             .catch(console.log)
       ).catch(console.log);
       
