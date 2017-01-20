@@ -320,10 +320,10 @@ var ENUM = {
 
       4: {
         id: "help",
-        usage: "help [channel]",
+        usage: "help (channel|command) [channel|command]",
         cmd: "help",
         value: 4,
-        desc: "Sends a DM listing all recognized bot commands permitted for the user in [channel]. If unspecified, this will list commands for all channels.",
+        desc: "For the (channel) option, this sends a DM listing all recognized bot commands permitted for the user in the specified [channel]. If unspecified, this will list commands for the current channel.\nFor the (command) option, this sends a detailed description about the specified [command].",
         perm: [],
         enableDM: true,
         channels: [ "main", "battle", "shop", "oc", "debug" ]
@@ -343,7 +343,7 @@ var ENUM = {
         usage: "info [option] [suboption]",
         cmd: "info",
         value: 6,
-        desc: `Lists information about [option], filtered by [suboption].\nCurrently supports the following options:\n*presets* :: List all available preset categories\n*variants [preset]* :: List all available variants for the given [preset]`,
+        desc: `Lists information about [option], filtered by [suboption].  Currently supports the following options:\n${CONFIG.prefix}info preset [preset] :: List all available preset categories, or a summary of the provided [preset].\n${CONFIG.prefix}info variant [preset] [variant] :: List details about the given [preset] [variant] pair.`,
         perm: [],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
@@ -354,7 +354,7 @@ var ENUM = {
         usage: "create [name] [preset] [variant]",
         cmd: "create",
         value: 7,
-        desc: `Creates a character named [name] using the [variant] of [preset] and makes it your partner.\n[name] should be alphanumeric, kana, and/or kanji.\nAny required extension will be added automatically.\nUse * to use a default name.\n[variant] is optional, but [preset] is required if [variant] is supplied`,
+        desc: `Creates a character named [name] using the [variant] of [preset] and makes it your partner.  [name] should be alphanumeric, kana, and/or kanji.  Any required extension will be added automatically.  Use * to keep the default name.  [variant] is optional, but [preset] is required if [variant] is supplied`,
         perm: [],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
@@ -364,7 +364,7 @@ var ENUM = {
         usage: "rename [name]",
         cmd: "rename",
         value: 8,
-        desc: `Change your partner's name to [name].\n[name] should be alphanumeric, kana, and/or kanji.\nAny required extension will be added automatically.`,
+        desc: `Change your partner's name to [name].  [name] should be alphanumeric, kana, and/or kanji.  Any required extension will be added automatically.`,
         perm: ["partnered"],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
@@ -374,7 +374,7 @@ var ENUM = {
         usage: "recolor [hexcolor]",
         cmd: "recolor",
         value: 9,
-        desc: `Change your partner's dialogue box color to [hexcolor]\n[hexcolor] is a hexadecimal color code such as #FF0000`,
+        desc: `Change your partner's dialogue box color to [hexcolor].  [hexcolor] is a hexadecimal color code such as #FF0000.`,
         perm: ["partnered"],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
@@ -384,17 +384,17 @@ var ENUM = {
         usage: "save (dialogue|personality|partition|folder)",
         cmd: "save",
         value: 10,
-        desc: "Download a copy of the specified data file\nCurrently only supports the dialogue and personality options.",
+        desc: "Download a copy of the specified data file.  Currently only supports the (dialogue) and (personality) options.",
         perm: ["partnered"],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
         },
       11: {
         id: "load",
-        usage: "load (avatar|dialogue|partition|folder) [url]",
+        usage: "load (avatar|dialogue|partition|folder) [file|url]",
         cmd: "load",
         value: 11,
-        desc: "Upload a copy of the specified data file.\nThe file can be an attachment, or you can supply the optional [url] to the file (good for iOS which doesn't have a normal filesystem)\nCurrently only supports the dialogue and avatar options.",
+        desc: "Upload a copy of the specified data file.  The [file] can be an attachment, or you can supply the optional [url] to the file (good for iOS which doesn't have a normal filesystem).  Currently only supports the (dialogue) and (avatar) options.",
         perm: ["partnered"],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
@@ -445,7 +445,7 @@ var ENUM = {
         usage: "stats",
         cmd: "stats",
         value: 16,
-        desc: "Get a DM with current information about your partner, such as level, xp, mood, currency, and battle stats",
+        desc: "Get a DM with current information about your partner, like battle stats and storage partitions.",
         perm: [],
         enableDM: true,
         channels: [ "main", "battle", "shop", "oc", "debug" ]

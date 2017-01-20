@@ -833,14 +833,7 @@ var COMMAND = {
     }    
   },  
   
-  // Helper functions that used to be part of ENUM.Command
-  getDetails: function() {
-    let str = ``;
-    for ( let p in ENUM.Command.properties ) {
-      str += `${FORMAT.code(ENUM.Command.properties[p].usage, CONFIG.prefix)}\n${ENUM.Command.properties[p].desc}\nUsable only by: ${ENUM.Command.properties[p].perm}\n\n`
-    }
-    return str;
-  },
+  // Helper functions
   isUserPermitted: function( cmd, author ) {
     if ( ENUM.Command.properties[ENUM.Command[cmd]].perm.length == 0 ) return true;
     return UTIL.boolMapReduce( false, ENUM.Command.properties[ENUM.Command[cmd]].perm, UTIL.roleMatch(author), UTIL.reduceOR );
@@ -854,58 +847,7 @@ var COMMAND = {
   },
   isPermitted: function( cmd, msg ) {
     return this.isChannelPermitted( cmd, msg.channel ) && this.isUserPermitted( cmd, msg.author );
-  },
-  
-  bases: function(msg, args) {
-    if ( ENUM.Preset.hasOwnProperty(args[0]) ) {
-      SERVER.channels.info
-        .sendMessage(`Summarizing all variants available for base keyword ${args[0].toUpperCase()}...`)
-        .catch(console.log);
-      SERVER.channels.info
-        .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
-          'normal', 'normal', ENUM.Preset.getSummary(ENUM.Preset[args[0]]), "", 
-          `${args[0].toUpperCase()} Base Variants`, ENUM.Preset.properties[ENUM.Preset[args[0]]].img ) ) )
-        .catch(console.log);
-    } else {
-      SERVER.channels.info
-        .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
-          'normal', 'normal', ENUM.Preset.getDetails(), "", "Available Base Keywords" ) ) )
-        .catch(console.log);
-    }
-  },
-  variants: function(msg, args) {
-    if (ENUM.Preset.hasOwnProperty(args[0])) {
-      let variants = ENUM.Preset.getVariants(BaseTypeEnum[args[0]]);
-
-      if (variants.length == 0) {
-        SERVER.channels.info.sendMessage(`${msg.author}: No variants available for base keyword ${args[0].toUpperCase()}...`);
-
-      } else {
-        SERVER.channels.info.sendMessage(`${msg.author}: Listing all variants for base keyword :${args[0].toUpperCase()}...`);
-        for ( let i=0; i<variants.length; i++ ) {
-          if ( variants[i] != null ) 
-            SERVER.channels.info
-              .sendEmbed( FORMAT.embed(variants[i]) )
-              .catch(console.log);
-        }
-      }
-    } else {
-      if ( args[0] ) {
-        msg.channel
-          .sendEmbed( FORMAT.embed( NPC.getEmbed( 
-            'error', 'error',
-            `ERROR!! ERROR!! ERROR!!\n\nUNRECOGNIZED BASE KEYWORD IN COMMAND:\n\n ${FORMAT.inline("VARIANTS " + args[0].toUpperCase())}\n\nPlease pick a valid base keyword and try this command again`) ) )
-          .catch(console.log);
-        COMMAND.bases(msg, args);
-      } else {
-        FORMAT.embed( NPC.getEmbed( 
-            'error', 'error',
-            `ERROR!! ERROR!! ERROR!!\n\nPlease pick a valid base keyword and try this command again`) )
-          .catch(console.log);
-        COMMAND.bases(msg, args);
-      }
-    }
-  },
+  },  
   challenge: function(msg, args) {
     SERVER.channels.info
       .sendEmbed( FORMAT.embed ( NPC.announcer.getEmbed( 
