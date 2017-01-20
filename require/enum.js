@@ -371,7 +371,7 @@ var ENUM = {
       },
       10: {
         id: "save",
-        usage: "save (dialogue|partition|folder)",
+        usage: "save (dialogue|personality|partition|folder)",
         cmd: "save",
         value: 10,
         desc: "Download a copy of the specified data file\nCurrently only supports the dialogue option.",

@@ -460,7 +460,7 @@ var COMMAND = {
       } else {
         msg.reply(`You did not specify what file you wanted to download.`)
           .catch(console.log);
-        msg.channel.sendMessage( FORMAT.embed( 
+        msg.channel.sendEmbed( FORMAT.embed( 
           allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'confused') ) )
           .catch(console.log);
       }
@@ -473,8 +473,17 @@ var COMMAND = {
   saveArgs: {
     dialogue: function( msg, partner, useOC ) {
       return { 
-        customdata: partner.getModifierSet(), 
-        file: `temp/dialogue_${msg.author.username}_${msg.author.discriminator}.txt` 
+        customdata: partner.custom.modifiers, 
+        file: `temp/dialogue_${msg.author.id}.txt` 
+      };
+    },
+    personality: function( msg, partner, useOC ) {
+      let d = ENUM.Personality
+        .properties[ENUM.Personality[partner.getPersonality()]]
+        .modifiers;
+      return { 
+        customdata: d, 
+        file: `temp/personality_${partner.getPersonality()}_${msg.author.id}.txt` 
       };
     },
     partition: function( msg, partner, useOC ) {
