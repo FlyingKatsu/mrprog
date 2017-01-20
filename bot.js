@@ -335,7 +335,71 @@ var COMMAND = {
     }
   },
   init: function(msg, args, useOC) {},
-  info: function(msg, args, useOC) {},
+  info: function(msg, args, useOC) {
+    // Process arguments
+    if ( args[0] ) {
+      let option = args[0].toLowerCase();
+      if ( this.infoArgs.hasOwnProperty(option) ) {
+          this.infoArgs[option]( msg, args );
+      } else {
+        this.feedbackError( ` ${option} is not a valid option.`, msg );
+        return;
+      }
+    } else {
+      msg.reply(`You did not specify what you wanted to learn about. Pick one of ( preset | variant [preset] )`)
+        .catch(console.log);
+    }
+  },
+  infoArgs: {
+    preset: function( msg, filter ) {
+      if (filter[1]) {
+        preset = ENUM.Preset.hasBase(filter[1].toLowerCase());
+        if ( preset ) {
+          msg.channel.sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
+            'normal', 'normal', `Loading information about the ${FORMAT.inline(filter[1])} preset...`
+             ) ) )
+            .catch(console.log);
+          msg.channel.sendEmbed( FORMAT.embed( ENUM.Preset.getSummary( preset.value ) ) )
+            .catch(console.log);
+        } else {
+          msg.reply(`${FORMAT.inline(filter[1])} is not a valid PRESET keyword.`)
+            .catch(console.log);
+        }
+      } else {
+        msg.channel.sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
+          'normal', 'normal', 'Loading information about PRESETS...'
+           ) ) )
+          .catch(console.log);
+        msg.channel.sendMessage( ENUM.Preset.getDetails() )
+          .catch(console.log);
+      }
+    },
+    presets: function(a,b) { this.preset(a,b); },
+    
+    variant: function( msg, filter ) {
+      if (filter[1] && filter[2]) {
+        preset = ENUM.Preset.hasBase(filter[1].toLowerCase());
+        variant = filter[2].toLowerCase();
+        isVariant = ENUM.Preset.hasVariant(preset.id, variant);
+        if ( preset && isVariant ) {
+          msg.channel.sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
+            'normal', 'normal', `Loading information about ${FORMAT.inline(filter[1])} ${FORMAT.inline(filter[2])}...`
+             ) ) )
+            .catch(console.log);
+          msg.channel.sendEmbed( FORMAT.embed( 
+            ENUM.Preset.getVariantDetails( preset.id, variant ) ) )
+            .catch(console.log);
+        } else {
+          msg.reply(`${FORMAT.inline(filter[1])} ${FORMAT.inline(filter[2])} is not a valid [preset] [variant] pair.`)
+            .catch(console.log);
+        }
+      } else {
+        msg.reply(`You did not specify a [preset] [variant] pair.`)
+        .catch(console.log);
+      }
+    },
+    variants:  function(a,b) { this.variant(a,b); }
+  },
   
   // Partner Customization
   create: function(msg, args, useOC) {

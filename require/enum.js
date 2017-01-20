@@ -1,3 +1,5 @@
+const CONFIG = require("./config.js");
+
 var ENUM = {
   Moral: {
     lawfulgood: 1,
@@ -141,6 +143,7 @@ var ENUM = {
     properties: {
       1: { 
         id: "default",
+        name: "Default Dialogue Set",
         desc: "Default dialogue lines for anyone",
         value: 1,
         modifiers: {
@@ -269,7 +272,7 @@ var ENUM = {
     
     help: 4,
     init: 5,
-    list: 6,
+    info: 6,
     
     create: 7,
     rename: 8,
@@ -822,7 +825,7 @@ Preset: {
           name: "Virus",
           value: 9,
           desc: "Placeholder until Version 0.5.0 or so. Part of Virus Breeding add-on.",
-          img: "avatars/empty.png",
+          img: "http://flyingkatsu.com/dsc/BattleNetworkFK/avatars/empty.png",
           variants: {}
       }
   },
@@ -837,33 +840,53 @@ Preset: {
     return false;
   },
   getSummary: function(key) {
-    let vlist = this.properties[key].variants;
-    let output = `VariantKey ::: VariantName\n------------------------\n`;
+    let base = this.properties[key];
+    let vlist = base.variants;
+    let btk = "`";
+    let output = `${base.desc}\r\n------------------------\r\n${btk}${btk}${btk}\r\n`;
     let count = 0;
     for ( let v in vlist ) {
       count++;
-      output += `${vlist[v].id} ::: ${vlist[v].custom.name}\n`;
-      if (count == 5) output += `------------------------\n`;
+      let numspace = "";
+      for( let s = 0; s < 12 - vlist[v].id.length; s++ ) numspace += " ";
+      output += `${vlist[v].id}${numspace}${vlist[v].custom.name}\r\n`;
+      if (count == 5) output += `${btk}${btk}${btk}\r\n------------------------\r\n${btk}${btk}${btk}\r\n`;
     }
-    if (count == 0) output = `------------------------\nNone of these variants is available yet!\n`;
-    output += `------------------------\n`;
-    return output;
+    if (count == 0) output = `------------------------\r\nNone of these variants is available yet!\r\n`;
+    output += `${btk}${btk}${btk}\r\n------------------------\r\n`;
+    return { title: `${base.name} Summary (${base.id})`, desc: output, imgurl: base.img, foot: `${CONFIG.prefix}info variants ${base.id.toUpperCase()} [VARIANT]` };
   },
   getDetails: function() {
-    let str = `------------------------\n\n`;
+    let str = "--------------------------------\r\n";
+    let btk = "`";
     for ( let p in this.properties ) {
       let base = this.properties[p];
       if (Object.keys(base.variants).length > 0) {
-        str += `**${base.name}** : ${base.desc}\n${btk}${btk}${btk}\nBaseType: ${base.id}\nVariants: `;
+        str += `**${base.name}** : ${base.desc}\r\n${btk}${btk}${btk}\r\nPreset: ${base.id}\nVariants: `;
         let count = Object.keys(base.variants).length;
         for ( let vkey in base.variants ) {
           str += `${base.variants[vkey].id}`;
           if ( count-- != 1 ) str += " | ";
         }
-        str += `${btk}${btk}${btk}\n\n`;
+        str += `\r\n${btk}${btk}${btk}\r\n--------------------------------\r\n`;
       }
     }
     return str;
+  },
+  getVariantDetails: function(basekey, variant) {
+    let v = this.properties[this[basekey]].variants[variant];
+    let desc = "";
+    desc += `**Alignment**:  ${ENUM.Moral.properties[ENUM.Moral[v.custom.alignment]].name}\r\n`;
+    desc += `**Personality**:  ${ENUM.Personality.properties[ENUM.Personality[v.custom.personality]].name}\r\n`;
+    // TODO: Add battle stats to this
+    let foot = `${CONFIG.prefix}create NAME ${basekey.toUpperCase()} ${variant.toUpperCase()}`;
+    return { 
+        title: v.custom.name, 
+        thumb: v.custom.img, 
+        color: v.custom.color,
+        desc: desc,
+        foot: foot
+      };
   },
   getVariants: function(key) {
     let vlist = this.properties[key].variants;
