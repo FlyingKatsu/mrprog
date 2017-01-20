@@ -180,6 +180,14 @@ var UTIL = {
     SERVER.roles.admin = SERVER.guild.roles.find('name', CONFIG.roles.admin);
   },
   
+  mapIf: function( resultArray, inputArray, condFn ) {
+    var result = resultArray;
+    for (var i=0; i < inputArray.length; i++) {
+      if ( condFn(inputArray[i]) ) result.push(inputArray[i]);
+    }
+    return result;
+  },
+  
   boolMapReduce: function(input, arr, fnIN, fnOUT) {
     var result = input;
     for (var i=0; i<arr.length; i++) {
@@ -202,9 +210,22 @@ var UTIL = {
     }
   },
   
+  filterCmdByChannel: function ( channel ) {
+    return function( item ) {
+      if ( typeof ENUM.Command[item] === "number" )  return COMMAND.isChannelPermitted( item, channel );
+      return false;
+    }
+  },
+  
   roleMatch: function( user ) {
     return function( item ) {
       return SERVER.guild.member(user).roles.has(SERVER.roles[item].id);
+    }
+  },
+  
+  filterCmdByUser: function ( user ) {
+    return function( item ) {
+      return COMMAND.isUserPermitted( item, user );
     }
   },
   
@@ -323,16 +344,37 @@ var COMMAND = {
   
   // Informative Functions
   help: function(msg, args, useOC) {
+    
+    let channel = msg.channel;
+    
     if( args[0] ) {
-      SERVER.channels.info
-        //.sendEmbed( FORMAT.embed( {  } ) )
-        .sendCode( 'md', this.getDetails() )
+      channel = SERVER.channels[args[0].toLowerCase()];
+      if ( !channel ) {
+        msg.reply(`You did not specify a valid channel. Pick one of ( main | shop | battle | oc | debug )`)
         .catch(console.log);
-    } else {
-      msg.author
-        .sendCode( 'md', this.getDetails() )
-        .catch(console.log);
+        return;
+      }
     }
+    
+    // Get all commands where channel is enabled
+    let channelEnabled = UTIL.mapIf( [], Object.keys(ENUM.Command), UTIL.filterCmdByChannel(channel) );
+    
+    //console.log(channelEnabled);
+    
+    // Filter out all commands where user is not permitted
+    let filteredCmd = UTIL.mapIf( [], channelEnabled, UTIL.filterCmdByUser(msg.author) );
+    
+    //console.log(filteredCmd);
+    
+    // Send the result
+    msg.author
+      .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
+          'normal', 'normal', 
+          `Loading command list, for commands allowed by ${msg.author} in ${channel.name} ...` ) ) )
+      .catch(console.log);
+    msg.author
+      .sendMessage( ENUM.Command.getDetails( filteredCmd ) )
+      .catch(console.log);
   },
   init: function(msg, args, useOC) {},
   info: function(msg, args, useOC) {
@@ -764,16 +806,19 @@ var COMMAND = {
     }
     return str;
   },
-  isUserPermitted: function( cmd, msg ) {
+  isUserPermitted: function( cmd, author ) {
     if ( ENUM.Command.properties[ENUM.Command[cmd]].perm.length == 0 ) return true;
-    return UTIL.boolMapReduce( false, ENUM.Command.properties[ENUM.Command[cmd]].perm, UTIL.roleMatch(msg.author), UTIL.reduceOR );
+    return UTIL.boolMapReduce( false, ENUM.Command.properties[ENUM.Command[cmd]].perm, UTIL.roleMatch(author), UTIL.reduceOR );
+  },
+  isChannelPermitted: function( cmd, channel ) {
+    if ( channel.type === "dm" ) {
+      return ENUM.Command.properties[ENUM.Command[cmd]].enableDM;
+    } else {
+      return UTIL.boolMapReduce( false, ENUM.Command.properties[ENUM.Command[cmd]].channels, UTIL.channelMatch(channel), UTIL.reduceOR );
+    }
   },
   isPermitted: function( cmd, msg ) {
-    if ( msg.channel.type === "dm" ) {
-      return ENUM.Command.properties[ENUM.Command[cmd]].enableDM && this.isUserPermitted( cmd, msg );
-    } else {
-      return UTIL.boolMapReduce( false, ENUM.Command.properties[ENUM.Command[cmd]].channels, UTIL.channelMatch(msg.channel), UTIL.reduceOR ) && this.isUserPermitted( cmd, msg );
-    }
+    return this.isChannelPermitted( cmd, msg.channel ) && this.isUserPermitted( cmd, msg.author );
   },
   
   bases: function(msg, args) {

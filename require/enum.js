@@ -450,6 +450,15 @@ var ENUM = {
         enableDM: true,
         channels: [ "main", "battle", "shop", "oc", "debug" ]
       }        
+  },
+  getDetails: function ( subset ) {
+    let btk = "```";
+    let str = `${btk}\r\n`;
+      for ( let i = 0; i < subset.length; i++ ) {
+        console.log( subset[i] );
+        str += `${CONFIG.prefix}${this.properties[this[ subset[i] ]].usage}\r\n\r\n`;
+      }
+      return `${str}\r\n${btk}`;
   }
 },
 
@@ -588,7 +597,7 @@ Preset: {
           name: "GenericNavi",
           value: 2,
           desc: "Human-like Navis commonly used as NPCs.",
-          img: "http://flyingkatsu.com/dsc/BattleNetworkFK/avatars/generic.png",
+          img: "http://flyingkatsu.com/dsc/BattleNetworkFK/avatars/generic2.png",
           variants: {
             egg: {
               id: "egg",
@@ -719,7 +728,7 @@ Preset: {
           name: "Cameo Navis",
           value: 7,
           desc: "Fan favorite NetNavis.",
-          img: "http://flyingkatsu.com/dsc/BattleNetworkFK/avatars/cameo.png",
+          img: "http://flyingkatsu.com/dsc/BattleNetworkFK/avatars/cameo2.png",
           variants: {
               protoman: {
                 id: "protoman",
@@ -852,7 +861,7 @@ Preset: {
       output += `${vlist[v].id}${numspace}${vlist[v].custom.name}\r\n`;
       if (count == 5) output += `${btk}${btk}${btk}\r\n------------------------\r\n${btk}${btk}${btk}\r\n`;
     }
-    if (count == 0) output = `------------------------\r\nNone of these variants is available yet!\r\n`;
+    if (count == 0) output = `------------------------\r\nNone of these variants is available yet!\r\n${btk}${btk}${btk}\r\n`;
     output += `${btk}${btk}${btk}\r\n------------------------\r\n`;
     return { title: `${base.name} Summary (${base.id})`, desc: output, imgurl: base.img, foot: `${CONFIG.prefix}info variants ${base.id.toUpperCase()} [VARIANT]` };
   },
