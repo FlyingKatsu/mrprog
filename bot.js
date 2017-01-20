@@ -415,6 +415,9 @@ var COMMAND = {
     if ( !name || ( name && !FORMAT.isAlphaNumericJP( name ) ) ) {
       msg.reply(`${FORMAT.inline(name)} is not a valid [name]\n[name] should be alphanumeric, kana, and/or kanji.\nAny required suffix will be added automatically.`)
         .catch(console.log);
+      msg.channel.sendEmbed( FORMAT.embed( 
+        allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'confused') ) )
+        .catch(console.log);
       return;
     }
     
@@ -436,6 +439,9 @@ var COMMAND = {
         
     if ( !color || ( color && !FORMAT.isHexCode( color ) ) ) {
       msg.reply(`${FORMAT.inline(color)} is not a valid [hexcolor]!`)
+        .catch(console.log);
+      msg.channel.sendEmbed( FORMAT.embed( 
+        allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'confused') ) )
         .catch(console.log);
       return;
     }
@@ -605,7 +611,7 @@ var COMMAND = {
       partner.reset();
       
       // Bootup
-      msg.channel.sendMessage( FORMAT.embed( 
+      msg.channel.sendEmbed( FORMAT.embed( 
         allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'greeting') ) )
         .catch(console.log);
       
@@ -843,7 +849,7 @@ CLIENT.on( 'message', msg => {
       // Check in on partner status
       msg.channel
         .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 'normal', 'normal', 
-          `Hello, ${msg.author}!\n\nHow is your ${CONFIG.partnerLabel}, ${partner.name}, doing?` ) ) )
+          `Hello, ${msg.author}!\n\nHow is your ${CONFIG.partnerLabel}, ${partner.getName()}, doing?` ) ) )
         .catch(console.log);
       // Get partner response
       msg.channel
@@ -882,7 +888,7 @@ CLIENT.on( 'message', msg => {
       // alert that this user is not permitted
       msg.author
         .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 'error', 'error', 
-        `ERROR!! ERROR!! ERROR!!\n\n${FORMAT.code(`User: ${name}\nChannel: ${msg.channel.name}\nCommand: ${CONFIG.prefix}${cmd}${args.join(" ")}`)}\n\nACCESS DENIED!!`) ) )
+        `ERROR!! ERROR!! ERROR!!\n\n${FORMAT.code(`User: ${name}\nChannel: ${msg.channel.name}\nCommand: ${CONFIG.prefix}${cmd}${args.join("   ")}`)}\n\nACCESS DENIED!!`) ) )
         .catch(console.log);
       msg.author
         .sendMessage(`${name}, you are not permitted to use ${FORMAT.inline(cmd, CONFIG.prefix)} in ${msg.channel}`)
@@ -895,10 +901,10 @@ CLIENT.on( 'message', msg => {
     // alert that the command wasn't recognized
     msg.author
       .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 'error', 'error', 
-      `ERROR!! ERROR!! ERROR!!\n\n${FORMAT.code(`User: ${name}\nChannel: ${msg.channel.name}\nCommand: ${CONFIG.prefix}${cmd}${args.join(" ")}`)}\n\nCOMMAND NOT RECOGNIZED!!`) ) )
+      `ERROR!! ERROR!! ERROR!!\n\n${FORMAT.code(`User: ${name}\nChannel: ${msg.channel.name}\nCommand: ${CONFIG.prefix}${cmd}${args.join("   ")}`)}\n\nCOMMAND NOT RECOGNIZED!!`) ) )
       .catch(console.log);
     msg.author
-      .sendMessage(`${name}, type ${FORMAT.inline(cmd, CONFIG.prefix)} to list all recognized commands.`)
+      .sendMessage(`${name}, type ${FORMAT.inline(ENUM.Command.properties[ENUM.Command["help"]].id, CONFIG.prefix)} to list all recognized commands.`)
       .catch(console.log);
     /*msg.delete(1000)
       .then(msg => console.log(`Deleted message from ${msg.author}`))
