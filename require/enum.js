@@ -304,7 +304,7 @@ var ENUM = {
         value: 3,
         desc: "Delete last [number] of messages in the specified channel. If unspecified, defaults to deleting last 10 messages in current channel.\n2 < [number] < 200",
         perm: ["mod", "admin"],
-        enableDM: true,
+        enableDM: false,
         channels: [ "main", "battle", "shop", "oc", "debug" ]
       },
 
@@ -374,7 +374,7 @@ var ENUM = {
         usage: "save (dialogue|personality|partition|folder)",
         cmd: "save",
         value: 10,
-        desc: "Download a copy of the specified data file\nCurrently only supports the dialogue option.",
+        desc: "Download a copy of the specified data file\nCurrently only supports the dialogue and personality options.",
         perm: ["partnered"],
         enableDM: true,
         channels: [ "main", "oc", "debug" ]
