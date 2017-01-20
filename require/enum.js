@@ -451,7 +451,7 @@ var ENUM = {
         channels: [ "main", "battle", "shop", "oc", "debug" ]
       }        
   },
-  getDetails: function ( subset ) {
+  getList: function ( subset ) {
     let btk = "```";
     let str = `${btk}\r\n`;
       for ( let i = 0; i < subset.length; i++ ) {
@@ -459,6 +459,22 @@ var ENUM = {
         str += `${CONFIG.prefix}${this.properties[this[ subset[i] ]].usage}\r\n\r\n`;
       }
       return `${str}\r\n${btk}`;
+  },
+  getDetails: function ( id ) {
+    let cmd = this.properties[this[id]];
+    let btk = "```";
+    let str = "";
+    str += `${btk}\r\n${CONFIG.prefix}${cmd.usage}\r\n${btk}\r\n`;
+    str += `${btk}\r\nDescription: ${cmd.desc}\r\n${btk}\r\n`;
+    str += `${btk}\r\nUsable in these channels: ${cmd.channels.join(" | ")}\r\n${btk}\r\n`;
+    if (cmd.perm.length > 0) str += `${btk}\r\nRestricted to these roles: ${cmd.perm.join(" | ")}\r\n${btk}\r\n`;
+    return str;
+  },
+  isCommand: function ( cmd ) {
+    for ( p in this.properties ) {
+      if ( this.properties[p].cmd === cmd ) return this.properties[p];
+    }
+    return false;
   }
 },
 

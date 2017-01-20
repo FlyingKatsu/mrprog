@@ -344,37 +344,72 @@ var COMMAND = {
   
   // Informative Functions
   help: function(msg, args, useOC) {
-    
-    let channel = msg.channel;
-    
-    if( args[0] ) {
-      channel = SERVER.channels[args[0].toLowerCase()];
-      if ( !channel ) {
-        msg.reply(`You did not specify a valid channel. Pick one of ( main | shop | battle | oc | debug )`)
-        .catch(console.log);
+    // Process arguments
+    if ( args[0] ) {
+      let option = args[0].toLowerCase();
+      if ( this.helpArgs.hasOwnProperty(option) ) {
+          this.helpArgs[option]( msg, args );
+      } else {
+        this.feedbackError( ` ${option} is not a valid option.`, msg );
         return;
       }
+    } else {
+      this.helpArgs.channel( msg, args );
+    }    
+  },
+  helpArgs: {
+    channel: function( msg, args ) {
+      let channel = msg.channel;
+
+      if( args[1] ) {
+        channel = SERVER.channels[args[1].toLowerCase()];
+        if ( !channel ) {
+          msg.reply(`You did not specify a valid channel. Pick one of ( main | shop | battle | oc | debug )`)
+          .catch(console.log);
+          return;
+        }
+      }
+
+      // Get all commands where channel is enabled
+      let channelEnabled = UTIL.mapIf( [], Object.keys(ENUM.Command), UTIL.filterCmdByChannel(channel) );
+
+      //console.log(channelEnabled);
+
+      // Filter out all commands where user is not permitted
+      let filteredCmd = UTIL.mapIf( [], channelEnabled, UTIL.filterCmdByUser(msg.author) );
+
+      //console.log(filteredCmd);
+
+      // Send the result
+      msg.author
+        .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
+            'normal', 'normal', 
+            `Loading command list, for commands allowed by ${msg.author} in #${channel.name} ...`, `${CONFIG.prefix}help command [command]` ) ) )
+        .catch(console.log);
+      msg.author
+        .sendMessage( ENUM.Command.getList( filteredCmd ) )
+        .catch(console.log);
+    },
+    command: function( msg, args ) {
+      if ( args[1] ) {
+        let cmd = ENUM.Command.isCommand(args[1].toLowerCase());
+        if ( cmd ) {
+          msg.author
+            .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
+                'normal', 'normal', 
+                `Loading description for the command, ${FORMAT.inline(args[1])}...`, `${CONFIG.prefix}help command [command]` ) ) )
+              .catch(console.log);
+          msg.author
+            .sendMessage( ENUM.Command.getDetails(cmd.id) )
+            .catch(console.log);
+        } else {
+          COMMAND.feedbackError( ` ${FORMAT.inline(args[1])} is not a valid command.`, msg );
+          return;
+        }
+      } else {
+        COMMAND.feedbackError( ` You did not specify which command you needed help with`, msg );
+      }
     }
-    
-    // Get all commands where channel is enabled
-    let channelEnabled = UTIL.mapIf( [], Object.keys(ENUM.Command), UTIL.filterCmdByChannel(channel) );
-    
-    //console.log(channelEnabled);
-    
-    // Filter out all commands where user is not permitted
-    let filteredCmd = UTIL.mapIf( [], channelEnabled, UTIL.filterCmdByUser(msg.author) );
-    
-    //console.log(filteredCmd);
-    
-    // Send the result
-    msg.author
-      .sendEmbed( FORMAT.embed( NPC.guide.getEmbed( 
-          'normal', 'normal', 
-          `Loading command list, for commands allowed by ${msg.author} in ${channel.name} ...` ) ) )
-      .catch(console.log);
-    msg.author
-      .sendMessage( ENUM.Command.getDetails( filteredCmd ) )
-      .catch(console.log);
   },
   init: function(msg, args, useOC) {},
   info: function(msg, args, useOC) {
