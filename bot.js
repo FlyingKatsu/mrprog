@@ -356,7 +356,7 @@ var COMMAND = {
       if (base) base = base.toLowerCase();
       if (variant) variant = variant.toLowerCase();
       
-      if ( name && !FORMAT.isAlphaNumericJP( name ) ) {
+      if ( !name || ( name && !FORMAT.isAlphaNumericJP( name ) ) ) {
         msg.reply(`${FORMAT.inline(name)} is not a valid [name]\n[name] should be alphanumeric, kana, and/or kanji.\nAny required suffix will be added automatically.`)
           .catch(console.log);
         return;
@@ -391,10 +391,10 @@ var COMMAND = {
     }
   },  
   rename: function(msg, args, useOC) {
-    var name = args[0] || "";
+    var name = args[0] || null;
     if (name) name = name.strip("asterix").strip("suffix");
       
-    if ( !FORMAT.isAlphaNumericJP( name ) ) {
+    if ( !name || ( name && !FORMAT.isAlphaNumericJP( name ) ) ) {
       msg.reply(`${FORMAT.inline(name)} is not a valid [name]\n[name] should be alphanumeric, kana, and/or kanji.\nAny required suffix will be added automatically.`)
         .catch(console.log);
       return;
@@ -405,7 +405,7 @@ var COMMAND = {
     if ( allPartners.has( msg.author.id ) ) {
       let partner = allPartners.get(msg.author.id);
       partner.setName(name);
-      msg.channel.sendMessage( FORMAT.embed( 
+      msg.channel.sendEmbed( FORMAT.embed( 
         allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'customized') ) )
         .catch(console.log);
     } else {
@@ -414,9 +414,9 @@ var COMMAND = {
     }
   },
   recolor: function(msg, args, useOC) {
-    let color = args[0].strip("hash").slice(0,6);
+    let color = (args[0]) ? args[0].strip("hash").slice(0,6) : null;
         
-    if ( !FORMAT.isHexCode( color ) ) {
+    if ( !color || ( color && !FORMAT.isHexCode( color ) ) ) {
       msg.reply(`${FORMAT.inline(color)} is not a valid [hexcolor]!`)
         .catch(console.log);
       return;
@@ -425,7 +425,7 @@ var COMMAND = {
     if ( allPartners.has( msg.author.id ) ) {
       let partner = allPartners.get(msg.author.id);
       partner.setColor("#"+color);
-      msg.channel.sendMessage( FORMAT.embed( 
+      msg.channel.sendEmbed( FORMAT.embed( 
         allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'customized') ) )
         .catch(console.log);
     } else {
