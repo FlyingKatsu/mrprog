@@ -21,12 +21,12 @@ var FactoryNPC = function( input ) {
 // ===============================================
 FactoryNPC.prototype.getEmbed = function( imgID, colorID, text, foot, title, image ) {
   return {
-    author: this.name,
+    title: this.name,
     desc: text,
     thumb: this.img[imgID],
     color: this.color[colorID],
     foot: foot,
-    title: title,
+    author: title,
     imgurl: image
   };
 };
@@ -41,7 +41,7 @@ var NPC = {
   
   // Main responder for the bot
   guide: new FactoryNPC ( {
-    name: "MR.PROG"
+    name: "Mr.Prog"
   } ),
   
   // Battle responder for the bot

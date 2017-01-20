@@ -72,12 +72,135 @@ FactoryPartner.prototype.getEmbed = function( author, useOC, sit, foot ) {
       this.owner, author, this.getDialogue( sit, feeling.id ) );
   this.applyMod(this.getModifier(sit));
   return {
-    author: `${this.getName()} 「${feeling.name}」`,
+    title: `${this.getName()} 「${feeling.name}」`,
     thumb: this.getImg( useOC ),
     color: this.getColor(),
     desc: dialogue,
     foot: foot || `Level ${this.level} | XP: ${this.xp}/${LevelTiers.getTier(this.level)} | Zenny: ${this.zenny} | BugFrag: ${this.bugfrag}`
   }
+};
+FactoryPartner.prototype.getStats = function( useOC ) {
+  let feeling = ENUM.Feeling.properties[parseInt(this.mood)];
+  return {
+    title: `${this.getName()} 「${feeling.name}」`,
+    thumb: this.getImg( useOC ),
+    color: this.getColor(),
+    desc: "\r\nMy Stats!\r\n" + this.getBattleStats(),
+    foot: `Level ${this.level} | XP: ${this.xp}/${LevelTiers.getTier(this.level)} | Zenny: ${this.zenny} | BugFrag: ${this.bugfrag}`
+  }
+};
+FactoryPartner.prototype.getBattleStats = function() {
+    // TODO: put this in constructor for partner and custom data
+    let hp = 100;
+    let boost = {
+      hp: 0,
+      basic: "Buster",
+      charge: 0,
+      atk: 0,
+      def: 0,
+      spd: 0,
+      folder: "None",
+      weak: "None"
+    };
+    let base = {
+      hp: 100,
+      basic: "Buster",
+      charge: 1,
+      atk: 1,
+      def: 1,
+      spd: 1,
+      folder: "None",
+      weak: "None"
+    };
+    /*let hist = {
+        crisis: {
+          accept: 0,
+          bail: 0,
+          win: 0,
+          assist: 0,
+          lose: 0
+        },
+        virus: {
+          accept: 0,
+          bail: 0,
+          win: 0,
+          assist: 0,
+          lose: 0,
+          deleted: {
+            bunny: 0,
+            met: 0,
+            spikey: 0,
+            can: 0,
+            swordy: 0
+          }
+        },
+        boss: {
+          accept: 0,
+          bail: 0,
+          win: 0,
+          assist: 0,
+          lose: 0,
+          deleted: {
+            bass: 0,
+            darkmega: 0
+          }
+        },
+        naviduel: {
+          accept: 0,
+          bail: 0,
+          started: 0,
+          requested: 0,
+          win: 0,
+          assist: 0,
+          cheat: 0,
+          lose: 0
+        },
+        virusduel: {
+          accept: 0,
+          bail: 0,
+          started: 0,
+          requested: 0,
+          win: 0,
+          assist: 0,
+          cheat: 0,
+          lose: 0
+        },
+        royale: {
+          accept: 0,
+          bail: 0,
+          started: 0,
+          requested: 0,
+          win: 0,
+          assist: 0,
+          lose: 0
+        },
+        raid: {
+          accept: 0,
+          bail: 0,
+          win: 0,
+          assist: 0,
+          lose: 0
+        }
+      };*/
+    output =  "\r\n```\r\n";
+    output +=  `HP            ${hp} / ${base.hp + boost.hp}\r\n`;
+    output +=  `ATK           ${base.atk}  (+${boost.atk})\r\n`;
+    output +=  `DEF           x${base.def} (+${boost.def})\r\n`;
+    output +=  `SPD           x${base.spd} (+${boost.spd})\r\n`;
+    output +=  "```\r\n```\r\n";
+    output +=  `Basic         ${boost.basic}\r\n`;
+    output +=  `Charge        x${base.charge} (+${boost.charge})\r\n`;
+    output +=  "```\r\n```\r\n";
+    output +=  `Weakness      ${base.weak}\r\n`;
+    output +=  "```\r\n```\r\n";
+    output +=  `Total RAM     4MB\r\n`;
+    output +=  `Total Drive   500MB\r\n`;
+    output +=  `ChipFolder    0 / 250MB\r\n`;
+    output +=  `SubFolder     0 / 50MB\r\n`;
+    output +=  `NaviCust      0 / 50MB\r\n`;
+    output +=  `Virus Farm    0 / 150MB\r\n`;
+    output +=  "```\r\n";
+    return output;
 };
 FactoryPartner.prototype.getName = function() {
     return this.custom.name || this.getVariant().custom.name;

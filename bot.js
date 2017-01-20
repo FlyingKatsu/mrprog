@@ -676,7 +676,21 @@ var COMMAND = {
         .catch(console.log);
     }
   },
-  status: function(msg, args, useOC) {},  
+  stats: function(msg, args, useOC) {
+    // Check if really partnered
+    if ( allPartners.has( msg.author.id ) ) {
+      let partner = allPartners.get(msg.author.id);      
+      
+      msg.author.sendEmbed( FORMAT.embed( partner.getEmbed( msg.author, useOC, 'stats' ) ) )
+        .catch(console.log);
+      msg.author.sendMessage( partner.getBattleStats() )
+        .catch(console.log);
+      
+    } else {
+      msg.reply(`BUT YOU DON'T HAVE A ${CONFIG.partnerLabel.toUpperCase()} YET!!`)
+        .catch(console.log);
+    }    
+  },  
   
   // Helper functions that used to be part of ENUM.Command
   getDetails: function() {

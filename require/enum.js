@@ -241,6 +241,13 @@ var ENUM = {
             okay: "@User, I don't know if this suits me, but okay.", 
             withdrawn: "Oh...", 
             upset: "HMPH" 
+          } },
+          stats: { mod: null, dialogue: { 
+            happy: "Check out my stats!", 
+            content: "My stats!", 
+            okay: "My stats.", 
+            withdrawn: "Stats.", 
+            upset: "Can I get a little privacy in here?!" 
           } }
         }
       }
@@ -274,7 +281,7 @@ var ENUM = {
     netalerts: 13,
     jack: 14,
     hey: 15,
-    status: 16,
+    stats: 16,
     
     properties: {
       1: {
@@ -431,9 +438,9 @@ var ENUM = {
         channels: [ "main", "battle", "shop", "oc", "debug" ]
       },        
       16: {
-        id: "status",
-        usage: "status",
-        cmd: "status",
+        id: "stats",
+        usage: "stats",
+        cmd: "stats",
         value: 16,
         desc: "Get a DM with current information about your partner, such as level, xp, mood, currency, and battle stats",
         perm: [],
