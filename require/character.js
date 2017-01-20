@@ -67,17 +67,16 @@ FactoryPartner.prototype.applyMod = function( num ) {
 
 // PARTNER GETTERS
 FactoryPartner.prototype.getEmbed = function( author, useOC, sit, foot ) {
+  let feeling = ENUM.Feeling.properties[parseInt(this.mood)];
   let dialogue = CUSTOM.replaceTextVar( 
-      this.owner,
-      author,
-      this.getDialogue( sit, ENUM.Feeling.properties[parseInt(this.mood)].id ) );
+      this.owner, author, this.getDialogue( sit, feeling.id ) );
   this.applyMod(this.getModifier(sit));
   return {
-    author: this.getName(),
+    author: `${this.getName()} 「${feeling.name}」`,
     thumb: this.getImg( useOC ),
     color: this.getColor(),
     desc: dialogue,
-    foot: foot || `Level: ${this.level} | XP: ${this.xp}/${LevelTiers.getTier(this.level)} | Zenny: ${this.zenny} | BugFrag: ${this.bugfrag}`
+    foot: foot || `Level ${this.level} | XP: ${this.xp}/${LevelTiers.getTier(this.level)} | Zenny: ${this.zenny} | BugFrag: ${this.bugfrag}`
   }
 };
 FactoryPartner.prototype.getName = function() {

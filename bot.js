@@ -94,6 +94,17 @@ var FORMAT = {
     return true;
   },
   
+  isNumeric: function ( str ) {
+    let code, i, len;
+    for (i = 0, len = str.length; i < len; i++) {
+      code = str.charCodeAt(i);
+      // NOTE: decimals are shifted by one due to comparison as > < instead of >= <=
+      if (!(code > 47 && code < 58)) // numeric (0-9)
+      { return false; }
+    }
+    return true;
+  },
+  
   isAlphaNumericJP: function( str ) {
     // Adapted from Michael Martin-Smucker on StackOverflow
     // http://stackoverflow.com/questions/4434076/best-way-to-alphanumeric-check-in-javascript/25352300#25352300
@@ -261,10 +272,14 @@ var COMMAND = {
   // Admin / Mod Functions
   shutdown: function(msg, args, useOC) {
     SERVER.channels.main
-      .sendMessage(`${SERVER.roles.partnered} ${CONFIG.botname} has been taken offline by ${msg.author}`)
+      .sendMessage(`${SERVER.roles.partnered} ${CONFIG.botname} is shutting down at ${msg.author}'s request`)
       .catch(console.log);
     CLIENT.destroy()
-      .catch(console.log);
+      .catch( console.error );
+        /*function (error) {
+        console.log(error);
+        msg.reply("Failed to shutdown the bot. Have the bot admin check the console for error specifics.");
+      } );*/
   },
   test: function(msg, args) {
     SERVER.channels.debug
@@ -274,15 +289,20 @@ var COMMAND = {
   clear: function(msg, args) {
     // TODO: Check user individual permissions to delete messages
     let numDel = (args[0]) ? parseInt(args[0]) : 10;
-    if (numDel <= 2 || numDel >= 200) {
-      msg.reply( ` CLEAR command accepts only values greater than 2 and less than 200!` )
-        .catch(console.log);
+    if ( !numDel || numDel <= 2 || numDel >= 200) {
+      this.feedbackError('CLEAR command accepts only values greater than 2 and less than 200!', msg);
+      return;
     } else {
       
       let channel = msg.channel;
       
-      if ( args[1] && SERVER.channels[ args[1].toLowerCase() ] ) {
+      if (args[1]) {
+        if ( SERVER.channels[ args[1].toLowerCase() ] ) {
          channel = SERVER.channels[ args[1].toLowerCase() ];
+        } else {
+          this.feedbackError('Not a valid channel. Choose one of (main|shop|battle|oc|debug)', msg);
+          return;
+        }
       }
       
       channel.bulkDelete(numDel)
@@ -292,9 +312,12 @@ var COMMAND = {
               'normal', 'warning', 
               `${numDel} MESSAGES DELETED.`, 
               `by @${msg.author.username}#${msg.author.discriminator} in #${channel.name}` ) ) )
-            .catch(console.log)
-      ).catch(console.log);
-      
+            .catch(console.log) )
+        .catch( console.error );
+          /*function(error) {
+            console.log(error);
+            msg.reply(`Failed to delete messages for ${channel}. Please check bot permissions.`);
+          } );*/
     }
   },
   

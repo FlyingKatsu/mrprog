@@ -121,11 +121,11 @@ var ENUM = {
     withdrawn: 4,
     upset: 5,
     properties: {
-      1: { id: "happy", desc: "Smiling, so happy!", value: 1 },
-      2: { id: "content", desc: "Satisfied with life", value: 2 },
-      3: { id: "okay", desc: "Not feeling anything in particular", value: 3 },
-      4: { id: "withdrawn", desc: "Not interested in talking", value: 4 },
-      5: { id: "upset", desc: "Raging mad or terribly hurt", value: 5 }
+      1: { id: "happy", name: "Happy", desc: "Smiling, so happy!", value: 1 },
+      2: { id: "content", name: "Content", desc: "Satisfied with life", value: 2 },
+      3: { id: "okay", name: "Okay", desc: "Not feeling anything in particular", value: 3 },
+      4: { id: "withdrawn", name: "Withdrawn", desc: "Not interested in talking", value: 4 },
+      5: { id: "upset", name: "Upset", desc: "Raging mad or terribly hurt", value: 5 }
     },
     getDetails: function() {
       let str = `Here is a list of all current feeling keywords for dialogue tables:\n\n`;
