@@ -281,7 +281,7 @@ var COMMAND = {
       
       let channel = msg.channel;
       
-      if ( SERVER.channels[ args[1].toLowerCase() ] ) {
+      if ( args[1] && SERVER.channels[ args[1].toLowerCase() ] ) {
          channel = SERVER.channels[ args[1].toLowerCase() ];
       }
       
@@ -320,23 +320,20 @@ var COMMAND = {
       let partner = allPartners.get(msg.author.id);
       msg.reply(`BUT YOU ALREADY HAVE A ${CONFIG.partnerLabel.toUpperCase()}`)
         .catch(console.log);
-      msg.channel.sendMessage( FORMAT.embed( 
+      msg.channel.sendEmbed( FORMAT.embed( 
         allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'confused') ) )
         .catch(console.log);
     } else {
 
-      var name = args[0] || "",
-          base = args[1] || "",
-          variant = args[2] || "";
+      var name = args[0] || null,
+          base = args[1] || null,
+          variant = args[2] || null;
       
-      console.log(name);      
       if (name) name = name.strip("asterix").strip("suffix");
-      console.log(name);      
-      
       if (base) base = base.toLowerCase();
       if (variant) variant = variant.toLowerCase();
       
-      if ( !FORMAT.isAlphaNumericJP( name ) ) {
+      if ( name && !FORMAT.isAlphaNumericJP( name ) ) {
         msg.reply(`${FORMAT.inline(name)} is not a valid [name]\n[name] should be alphanumeric, kana, and/or kanji.\nAny required suffix will be added automatically.`)
           .catch(console.log);
         return;
@@ -362,7 +359,7 @@ var COMMAND = {
           name: name, 
           base: base, 
           variant: variant } ) );
-      msg.channel.sendMessage( FORMAT.embed( 
+      msg.channel.sendEmbed( FORMAT.embed( 
         allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'greeting') ) )
         .catch(console.log);
       SERVER.guild.member(msg.author)
@@ -704,7 +701,7 @@ var COMMAND = {
   feedbackError( text, msg, useOC, partner ) {
     msg.reply(text).catch(console.log);
     if ( partner ) {
-      msg.channel.sendMessage( FORMAT.embed( 
+      msg.channel.sendEmbed( FORMAT.embed( 
         allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'confused') ) )
         .catch(console.log);
     }

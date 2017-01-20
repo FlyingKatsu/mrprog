@@ -4,7 +4,7 @@ const ENUM = require("./enum.js");
 const LevelTiers = {
   scale: [ 100, 200, 350, 500, 750, 1000, 1500, 2000, 2500, 3000, 5000 ],
   getTier: function(lvl) {
-    return scale[lvl];
+    return this.scale[lvl];
   }
 };
 
@@ -15,8 +15,8 @@ const LevelTiers = {
 var FactoryChar = function( _input ) {
     let input = _input || {};
     this.owner = input.owner || null;
-    this.baseKey = input.baseKey || 1;
-    this.variantKey = input.variantKey || 0;
+    this.baseKey = ENUM.Preset[input.base] || 1;
+    this.variantKey = input.variant || 0;
     this.level = input.level || 0;
 };
 // ===============================================
@@ -43,7 +43,7 @@ var FactoryPartner = function( _input ) {
   let input = _input || {};
   // Own Properties
   this.xp = 0;
-  this.mood = 1;
+  this.mood = 1.00;
   this.numResets = 0;
   this.zenny = 0;
   this.bugfrag = 0;
@@ -60,23 +60,24 @@ FactoryPartner.prototype.reset = function() {
   this.custom = new CUSTOM.Customization();
 };
 FactoryPartner.prototype.applyMod = function( num ) {
-  this.mood += num;
-  if ( this.mood > 5 ) this.mood = 5;
-  if ( this.mood < -5 ) this.mood = -5;
+  this.mood -= num;
+  if ( this.mood > 5.00 ) this.mood = 5.00; //Angriest
+  if ( this.mood < 1.00 ) this.mood = 1.00; //Happiest
 };
 
 // PARTNER GETTERS
 FactoryPartner.prototype.getEmbed = function( author, useOC, sit, foot ) {
+  let dialogue = CUSTOM.replaceTextVar( 
+      this.owner,
+      author,
+      this.getDialogue( sit, ENUM.Feeling.properties[parseInt(this.mood)].id ) );
   this.applyMod(this.getModifier(sit));
   return {
     author: this.getName(),
     thumb: this.getImg( useOC ),
     color: this.getColor(),
-    desc: CUSTOM.replaceTextVar( 
-      this.owner,
-      author,
-      this.getDialogue( sit, ENUM.Feeling.properties[parseInt(this.mood)] ) ),
-    foot: foot || `Level:${this.level}|XP:${this.xp}/${LevelTiers.getTier(this.level)}|Zenny:${this.zenny}|BugFrag:${this.bugfrag}`
+    desc: dialogue,
+    foot: foot || `Level: ${this.level} | XP: ${this.xp}/${LevelTiers.getTier(this.level)} | Zenny: ${this.zenny} | BugFrag: ${this.bugfrag}`
   }
 };
 FactoryPartner.prototype.getName = function() {
