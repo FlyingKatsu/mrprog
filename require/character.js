@@ -244,7 +244,7 @@ FactoryPartner.prototype.setBase = function( v ) {
     this.custom.base = v;
   };
 FactoryPartner.prototype.setImg = function( v ) {
-    this.custom.image = v;
+    this.custom.img = v;
   };
 FactoryPartner.prototype.setColor = function( v ) {
     this.custom.color = v;

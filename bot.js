@@ -234,13 +234,13 @@ var UTIL = {
     REQUEST( uri , function(error, response, body) {      
       if( !error && response.statusCode === 200 ) {
         if ( expectedType === "image" ) {
-          dataHandler( response );
+          dataHandler( response, uri );
         } else {
-          dataHandler( JSON.parse(body) );
+          dataHandler( JSON.parse(body), uri );
         }
       } else {
         console.log("There was an error loading your file...\n" + error);
-        dataHandler( );
+        statusResponder( { reason: error } );
       }
       console.log("========");
     })
@@ -713,8 +713,8 @@ var COMMAND = {
     avatar: function( msg, partner, useOC ) {
       return {
         expectedType: "image",
-        dataHandler: function( response ) {
-          partner.setImg( response.request.href );
+        dataHandler: function( response, uri ) {
+          partner.setImg( uri );
           msg.channel.sendEmbed( FORMAT.embed( 
             allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'customized') ) )
             .catch(console.log);
@@ -732,6 +732,8 @@ var COMMAND = {
             COMMAND.feedbackError( 
             `That file is too large! Maximum filesize allowed is ${SECRET.maxfilesize}`, 
             msg, useOC, partner );
+          } else if ( status.reason ) {
+            COMMAND.feedbackError( `${status.reason}`, msg, useOC, partner );
           }
         }
       };
@@ -740,12 +742,23 @@ var COMMAND = {
       msg.reply("this hasn't been implemented yet!").catch(console.log);
       return {
         expectedType: "json",
-        dataHandler: function( json ) {
+        dataHandler: function( json, uri ) {
           console.log("JSON: " + json);
         },
         statusResponder: function( status ) {
           console.log("Status Code: " + status.code);
           console.log("Reason: " + status.reason);
+          if (status.reason === "filetype") {
+            COMMAND.feedbackError( 
+            `That file is incompatible! File must be a TXT or JSON file.`, 
+            msg, useOC, partner );
+          } else if (status.reason === "filesize") {
+            COMMAND.feedbackError( 
+            `That file is too large! Maximum filesize allowed is ${SECRET.maxfilesize}`, 
+            msg, useOC, partner );
+          } else if ( status.reason ) {
+            COMMAND.feedbackError( `${status.reason}`, msg, useOC, partner );
+          }
         }
       };
     },
