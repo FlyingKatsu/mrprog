@@ -236,7 +236,12 @@ var UTIL = {
         if ( expectedType === "image" ) {
           dataHandler( response, uri );
         } else {
-          dataHandler( JSON.parse(body), uri );
+          try {
+            dataHandler( JSON.parse(body), uri );
+          } catch (e) {
+            //console.log(e);
+            statusResponder( { reason: e } );
+          }
         }
       } else {
         console.log("There was an error loading your file...\n" + error);
@@ -267,7 +272,7 @@ var UTIL = {
       
         let byteCounter = 0;
         response.on( 'data', function( data ) { 
-          console.log(`B:: ${byteCounter}`);    
+          //console.log(`B:: ${byteCounter}`);    
           
           if( byteCounter + data.length > SECRET.maxfilesize * 1000 ) {
             console.log("File too large!  Aborting...");
@@ -276,7 +281,7 @@ var UTIL = {
             
           } else {
             byteCounter += data.length; 
-            console.log(`B:: decoded ${data.length} total: ${byteCounter}`);
+            //console.log(`B:: decoded ${data.length} total: ${byteCounter}`);
           }
         } );
         response.on( 'end', function() {
@@ -739,11 +744,41 @@ var COMMAND = {
       };
     },
     dialogue: function( msg, partner, useOC ) {
-      msg.reply("this hasn't been implemented yet!").catch(console.log);
+      //msg.reply("this hasn't been implemented yet!").catch(console.log);
       return {
         expectedType: "json",
         dataHandler: function( json, uri ) {
-          console.log("JSON: " + json);
+          let counter = 0;
+          for ( let sit in partner.custom.modifiers ) {
+            if ( json.hasOwnProperty(sit) ) {
+              //console.log(sit);
+              //console.log(json[sit].mod);
+              if ( json[sit].hasOwnProperty( "mod" ) && typeof json[sit].mod === "number") {
+                partner.setModifier( sit, json[sit].mod );
+                counter++;
+              }
+              if ( json[sit].hasOwnProperty( "dialogue" ) ) {
+                for ( let feel in partner.custom.modifiers[sit].dialogue ) {
+                  //console.log(feel);
+                  //console.log(json[sit].dialogue[feel]);
+                  if ( json[sit].dialogue.hasOwnProperty(feel) && typeof json[sit].dialogue[feel] === "string") {
+                    counter++;
+                    partner.setDialogue( sit, feel, json[sit].dialogue[feel] );
+                  }
+                }
+              }
+            }
+          }
+          if ( counter === 0 ) {
+            COMMAND.feedbackError( 
+              `No changes were made to ${partner.getName()}'s dialogue. Are you sure you uploaded the right file?`, msg, useOC, partner );
+          } else {
+            msg.reply(`${counter} changes made to ${partner.getName()}'s dialogue'`)
+              .catch(console.log);
+            msg.channel.sendEmbed( FORMAT.embed( 
+              allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'customized') ) )
+              .catch(console.log);
+          }          
         },
         statusResponder: function( status ) {
           console.log("Status Code: " + status.code);
