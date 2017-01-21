@@ -263,8 +263,7 @@ var UTIL = {
             invalidCode = "filetype";
             self.abort();
           }
-        }
-        
+        }        
       
         let byteCounter = 0;
         response.on( 'data', function( data ) { 
@@ -668,7 +667,7 @@ var COMMAND = {
       // Process arguments
       if ( args[0] ) {
         let option = args[0].toLowerCase();
-        let output = (this.saveArgs.hasOwnProperty(option)) ?
+        let output = (this.loadArgs.hasOwnProperty(option)) ?
             this.loadArgs[option]( msg, partner, useOC ) : null;
         if (!output) {
           this.feedbackError( ` ${option} is not a valid option.`, msg, useOC, partner );
@@ -680,13 +679,13 @@ var COMMAND = {
           console.log("Checking for Attached File");
           let atfile = msg.attachments.first();
           
-          UTIL.sendFileRequest( atfile.url, output.dataHandler, output.statusResponder );
+          UTIL.sendFileRequest( atfile.url, output.expectedType, output.dataHandler, output.statusResponder );
 
         // Get URL data
         } else if ( args[1] ) {
           console.log("Checking for URL");
           
-          UTIL.sendFileRequest( args[1], output.dataHandler, output.statusResponder );
+          UTIL.sendFileRequest( args[1], output.expectedType, output.dataHandler, output.statusResponder );
 
         } else {
           console.log("No file detected!");
@@ -713,18 +712,34 @@ var COMMAND = {
   loadArgs: {
     avatar: function( msg, partner, useOC ) {
       return {
+        expectedType: "image",
         dataHandler: function( response ) {
-          console.log(JSON.stringify(response));
+          partner.setImg( response.request.href );
+          msg.channel.sendEmbed( FORMAT.embed( 
+            allPartners.get(msg.author.id).getEmbed( msg.author, useOC, 'customized') ) )
+            .catch(console.log);
+          if (!CONFIG.enableOC) msg.reply("NOTE: EnableOC is currently disabled").catch(console.log);
+          if (!useOC) msg.reply("NOTE: OC images are not permitted in this channel").catch(console.log);
         },
         statusResponder: function( status ) {
           console.log("Status Code: " + status.code);
           console.log("Reason: " + status.reason);
+          if (status.reason === "filetype") {
+            COMMAND.feedbackError( 
+            `That file is incompatible! File must be a PNG or JPEG image.`, 
+            msg, useOC, partner );
+          } else if (status.reason === "filesize") {
+            COMMAND.feedbackError( 
+            `That file is too large! Maximum filesize allowed is ${SECRET.maxfilesize}`, 
+            msg, useOC, partner );
+          }
         }
       };
     },
     dialogue: function( msg, partner, useOC ) {
       msg.reply("this hasn't been implemented yet!").catch(console.log);
       return {
+        expectedType: "json",
         dataHandler: function( json ) {
           console.log("JSON: " + json);
         },
@@ -939,7 +954,7 @@ CLIENT.on( 'message', msg => {
   if (msg.author.bot) return;
   
   // Find out if we should display OC avatars
-  let useOC = CONFIG.EnableOC && SERVER.channels.oc === msg.channel;
+  let useOC = CONFIG.enableOC && SERVER.channels.oc === msg.channel;
   
   // React to mention at me in MAIN or DM only
   if ( msg.mentions.users.exists('username', SECRET.botuser) 
